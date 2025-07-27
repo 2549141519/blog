@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
-    <title>Wei Haoyu</title>
+    <title>Nameless Monster</title>
     <meta name="viewport" content="width=device-width,minimum-scale=1">
     <meta name="description" content="点击返回🔗我的博客文章目录
 
@@ -81,8 +81,8 @@ char *Arena::AllocateFallback(std::size_t bytes)
     
 
     <meta property="og:url" content="http://localhost:1313/posts/kdb-%E5%86%85%E5%AD%98%E6%B1%A0/">
-  <meta property="og:site_name" content="Wei Haoyu">
-  <meta property="og:title" content="Wei Haoyu">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
   <meta property="og:description" content="点击返回🔗我的博客文章目录
 目录 {:toc} 1. 代码实现 kdb的内存池由arena.h和arena.cpp实现。
 实现内存池能够有效减少内存分配和释放的开销，提高系统性能。内存池的基本思想是预先分配一块大内存，并根据需要从中分配小块给应用程序使用，而不是每次都通过系统调用去动态分配和释放内存。
@@ -104,7 +104,7 @@ AllocateNewBlock: 该函数用于分配一个新的内存块。分配完新块�
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
 
-  <meta itemprop="name" content="Wei Haoyu">
+  <meta itemprop="name" content="Nameless Monster">
   <meta itemprop="description" content="点击返回🔗我的博客文章目录
 目录 {:toc} 1. 代码实现 kdb的内存池由arena.h和arena.cpp实现。
 实现内存池能够有效减少内存分配和释放的开销，提高系统性能。内存池的基本思想是预先分配一块大内存，并根据需要从中分配小块给应用程序使用，而不是每次都通过系统调用去动态分配和释放内存。
@@ -124,7 +124,7 @@ AllocateNewBlock: 该函数用于分配一个新的内存块。分配完新块�
 2.6 AllocateFallback中的块大小策略 char *Arena::AllocateFallback(std::size_t bytes) { if (bytes &gt; kBlockSize / 4) { char* result = AllocateNewBlock(bytes); return result; } alloc_ptr_ = AllocateNewBlock(kBlockSize); alloc_bytes_remaining_ = kBlockSize; char* result = alloc_ptr_; alloc_ptr_ &#43;= bytes; alloc_bytes_remaining_ -= bytes; return result; } 2.6.1 内存块小于或等于 kBlockSize / 4 的情况 对于小于等于 1024 字节的分配请求，Arena 会预先分配一个较大的内存块（大小为 4096 字节），并将多次分配集中在同一块内存中。">
   <meta itemprop="wordCount" content="151">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Wei Haoyu">
+  <meta name="twitter:title" content="Nameless Monster">
   <meta name="twitter:description" content="点击返回🔗我的博客文章目录
 目录 {:toc} 1. 代码实现 kdb的内存池由arena.h和arena.cpp实现。
 实现内存池能够有效减少内存分配和释放的开销，提高系统性能。内存池的基本思想是预先分配一块大内存，并根据需要从中分配小块给应用程序使用，而不是每次都通过系统调用去动态分配和释放内存。
@@ -156,7 +156,7 @@ AllocateNewBlock: 该函数用于分配一个新的内存块。分配完新块�
   <div class="flex-l center items-center justify-between">
     <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
       
-        Wei Haoyu
+        Nameless Monster
       
     </a>
     <div class="flex-l items-center">
@@ -272,7 +272,7 @@ AllocateNewBlock: 该函数用于分配一个新的内存块。分配完新块�
     <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
   <div class="flex justify-between">
   <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
-    &copy;  Wei Haoyu 2025 
+    &copy;  Nameless Monster 2025 
   </a>
     <div><div class="ananke-socials"></div>
 </div>

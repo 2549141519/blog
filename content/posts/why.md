@@ -5,8 +5,6 @@ title = 'Background '
 summary = ""  # 空摘要强制显示全文
 truncate = false  # 禁用截断
 +++
-
-
 ## Work History
 ***
 ### • ByteDance
@@ -53,4 +51,8 @@ B.Eng. in Communication Engineering | Sep 2019 – Jun 2023
 
 
 • 1st Place, Alibaba Cloud Tianchi Development Competition
+
+## Blog
+url:[🔗myblog](https://2549141519.github.io/#/toc)
+<div onclick="window.scrollTo({top:0,behavior:'smooth'});" style="background-color:white;position:fixed;bottom:20px;right:40px;padding:10px 10px 5px 10px;cursor:pointer;z-index:10;border-radius:13%;box-shadow:0.5px 3px 7px rgba(0,0,0,0.3);"><img src="https://2549141519.github.io/blogImg/backTop.png" alt="TOP" style="background-color:white;width:30px;"></div>
 <!--more-->

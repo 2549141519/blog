@@ -2,10 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/posts/</loc>
+    <loc>http://localhost:1313/</loc>
     <lastmod>2025-07-27T21:06:51+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/</loc>
+    <loc>http://localhost:1313/posts/</loc>
     <lastmod>2025-07-27T21:06:51+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/hello-world/</loc>
@@ -25,28 +25,6 @@
     <loc>http://localhost:1313/posts/google-file-system/</loc>
   </url><url>
     <loc>http://localhost:1313/posts/googletest-%E6%AF%94%E8%BE%83%E5%99%A8/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/kdb-%E5%86%85%E5%AD%98%E6%B1%A0/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/kdb-%E8%B7%B3%E8%A1%A8/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/mapreduce-for-nosql/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/mapreduce/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/miniob-b&#43;%E6%A0%91/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/miniob-bufferpool/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/miniob-debug-sql%E8%AF%AD%E5%8F%A5/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/miniob-sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/paxos-%E5%88%86%E5%B8%83%E5%BC%8F%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</loc>
-  </url><url>
-    <loc>http://localhost:1313/posts/pre-push%E6%9C%AC%E5%9C%B0%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/</loc>
   </url><url>
     <loc>http://localhost:1313/posts/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</loc>
   </url><url>
