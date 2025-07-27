@@ -9,18 +9,18 @@
     <lastBuildDate>Sun, 27 Jul 2025 21:06:51 +0800</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Background </title>
-      <link>http://localhost:1313/posts/why/</link>
-      <pubDate>Sun, 27 Jul 2025 21:06:51 +0800</pubDate>
-      <guid>http://localhost:1313/posts/why/</guid>
-      <description>&lt;h2 id=&#34;work-history&#34;&gt;Work History&lt;/h2&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-bytedance&#34;&gt;• ByteDance&lt;/h3&gt;&#xA;&lt;p&gt;Shanghai | Oct 2024 – Mar 2025&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Recommendation Architecture Engineer&lt;/p&gt;&#xA;&lt;p&gt;Ranking performance optimization &amp;amp; business support&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-tencent&#34;&gt;• Tencent&lt;/h3&gt;&#xA;&lt;p&gt;Shenzhen | Mar 2025 – Jun 2025&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Advertising Engine Engineer&lt;/p&gt;&#xA;&lt;p&gt;End-to-end RPC refactor/migration &amp;amp; DAG mechanism development&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-microsoft&#34;&gt;• Microsoft&lt;/h3&gt;&#xA;&lt;p&gt;Suzhou | Jun 2025 – Present&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Bing Search Engineer&lt;/p&gt;&#xA;&lt;p&gt;OPE (Outstanding-Personal-Entrepreneur)&lt;/p&gt;&#xA;&lt;h2 id=&#34;educaion&#34;&gt;Educaion&lt;/h2&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;• Shanghai Jiao Tong University&#xA;M.S. in Computer Science | Sep 2023 – Mar 2026 (expected)&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;• Hefei University of Technology&#xA;B.Eng. in Communication Engineering | Sep 2019 – Jun 2023&lt;/p&gt;&#xA;&lt;h2 id=&#34;publication&#34;&gt;Publication&lt;/h2&gt;&#xA;&lt;p&gt;• Haoyu Wei, Jingyu Ke, Ruibang Liu, and Guoqiang Li. &lt;a href=&#34;https://eprint.iacr.org/2025/1152&#34;&gt;ZK-ProVer: Proving Programming Verification in Non-Interactive Zero-Knowledge Proofs.&lt;/a&gt; In Proceedings of the 27th International Conference on Formal Engineering Methods (ICFEM&#39;25)&lt;/p&gt;&#xA;&lt;h2 id=&#34;competitions--honors&#34;&gt;Competitions &amp;amp; Honors&lt;/h2&gt;&#xA;&lt;p&gt;• 3rd Place, OceanBase Vector Database Development Challenge – Shanghai&lt;/p&gt;&#xA;&lt;p&gt;• Elite Talent, Tencent Rhino-Bird Open-Source Program&lt;/p&gt;&#xA;&lt;p&gt;• 1st Place, Alibaba Cloud Tianchi Development Competition&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>Welcome!</title>
       <link>http://localhost:1313/posts/hello-world/</link>
-      <pubDate>Sun, 27 Jul 2025 21:05:54 +0800</pubDate>
+      <pubDate>Sun, 27 Jul 2025 21:06:51 +0800</pubDate>
       <guid>http://localhost:1313/posts/hello-world/</guid>
       <description>&lt;p&gt;I am Haoyu Wei. My passion lies in the architecture of search, ads, and recommender systems, with a sharp focus on refactoring, performance tuning, Retrieval-Augmented Generation (RAG), and CUDA kernel development.&lt;/p&gt;&#xA;&lt;p&gt;If my profile resonates with you, feel free to reach me at +86 134 6570 0709. My core belief: learn by doing.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Background </title>
+      <link>http://localhost:1313/posts/why/</link>
+      <pubDate>Sun, 27 Jul 2025 21:05:54 +0800</pubDate>
+      <guid>http://localhost:1313/posts/why/</guid>
+      <description>&lt;h2 id=&#34;work-history&#34;&gt;Work History&lt;/h2&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-bytedance&#34;&gt;• ByteDance&lt;/h3&gt;&#xA;&lt;p&gt;Shanghai | Oct 2024 – Mar 2025&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Recommendation Architecture Engineer&lt;/p&gt;&#xA;&lt;p&gt;Ranking performance optimization &amp;amp; business support&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-tencent&#34;&gt;• Tencent&lt;/h3&gt;&#xA;&lt;p&gt;Shenzhen | Mar 2025 – Jun 2025&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Advertising Engine Engineer&lt;/p&gt;&#xA;&lt;p&gt;End-to-end RPC refactor/migration &amp;amp; DAG mechanism development&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;-microsoft&#34;&gt;• Microsoft&lt;/h3&gt;&#xA;&lt;p&gt;Suzhou | Jun 2025 – Present&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;Bing Search Engineer&lt;/p&gt;&#xA;&lt;p&gt;OPE (Outstanding-Personal-Entrepreneur)&lt;/p&gt;&#xA;&lt;h2 id=&#34;educaion&#34;&gt;Educaion&lt;/h2&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;• Shanghai Jiao Tong University&#xA;M.S. in Computer Science | Sep 2023 – Mar 2026 (expected)&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;• Hefei University of Technology&#xA;B.Eng. in Communication Engineering | Sep 2019 – Jun 2023&lt;/p&gt;&#xA;&lt;h2 id=&#34;publication&#34;&gt;Publication&lt;/h2&gt;&#xA;&lt;p&gt;• Haoyu Wei, Jingyu Ke, Ruibang Liu, and Guoqiang Li. &lt;a href=&#34;https://eprint.iacr.org/2025/1152&#34;&gt;ZK-ProVer: Proving Programming Verification in Non-Interactive Zero-Knowledge Proofs.&lt;/a&gt; In Proceedings of the 27th International Conference on Formal Engineering Methods (ICFEM&#39;25)&lt;/p&gt;&#xA;&lt;h2 id=&#34;competitions--honors&#34;&gt;Competitions &amp;amp; Honors&lt;/h2&gt;&#xA;&lt;p&gt;• 3rd Place, OceanBase Vector Database Development Challenge – Shanghai&lt;/p&gt;&#xA;&lt;p&gt;• Elite Talent, Tencent Rhino-Bird Open-Source Program&lt;/p&gt;&#xA;&lt;p&gt;• 1st Place, Alibaba Cloud Tianchi Development Competition&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
