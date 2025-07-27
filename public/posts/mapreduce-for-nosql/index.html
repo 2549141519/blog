@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Wei Haoyu</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. 前言
+本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。
+NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：
+
+sudo redis-server /etc/redis/redis.conf
+//启动redis6.0实例
+redis-cli -p 6380
+//连接redis6.0实例,6380为端口号
+redis-cli -p 6380 KEYS &ldquo;key*&rdquo; | xargs redis-cli -p 6380 DEL
+//删除redis6.0实例中以key*为前缀的所有key
+2. 使用go语言实现
+2.1 生成随机数据并存入Redis
+随机生成1万个单词，并写入redis数据库中：
+
+package main
+import (
+&ldquo;context&rdquo;
+&ldquo;fmt&rdquo;
+&ldquo;math/rand&rdquo;
+&ldquo;time&rdquo;
+&ldquo;github.com/go-redis/redis/v8&rdquo;
+)
+// 生成随机字符串
+func randomString(n int) string {
+letters := []rune(&ldquo;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&rdquo;)
+s := make([]rune, n)
+for i := range s {
+s[i] = letters[rand.Intn(len(letters))]
+}
+return string(s)
+}
+// 生成随机数据并存入Redis
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {
+ctx := context.Background()
+for i := 0; i &lt; count; i&#43;&#43; {
+key := fmt.Sprintf(&ldquo;key%d&rdquo;, i)
+value := randomString(3) // 生成长度为3的随机字符串
+err := rdb.Set(ctx, key, value, 0).Err()
+if err != nil {
+panic(err)
+}
+}
+fmt.Printf(&ldquo;Successfully generated and saved %d random data entries to Redis.\n&rdquo;, count)
+}
+func main() {
+// 设置随机种子
+rand.Seed(time.Now().UnixNano())
+// 连接到Redis
+rdb := redis.NewClient(&amp;redis.Options{
+Addr: &ldquo;localhost:6380&rdquo;, // Redis服务器地址
+DB:   0,                // 使用默认的DB
+})
+// 生成10000个随机数据并存入Redis
+generateDataAndSaveToRedis(rdb, 10000)
+}">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/mapreduce-for-nosql/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/mapreduce-for-nosql/">
+  <meta property="og:site_name" content="Wei Haoyu">
+  <meta property="og:title" content="Wei Haoyu">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 前言 本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。 NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：
+sudo redis-server /etc/redis/redis.conf
+//启动redis6.0实例
+redis-cli -p 6380
+//连接redis6.0实例,6380为端口号
+redis-cli -p 6380 KEYS “key*” | xargs redis-cli -p 6380 DEL
+//删除redis6.0实例中以key*为前缀的所有key
+2. 使用go语言实现 2.1 生成随机数据并存入Redis 随机生成1万个单词，并写入redis数据库中：
+package main
+import (
+“context”
+“fmt”
+“math/rand”
+“time”
+“github.com/go-redis/redis/v8”
+)
+// 生成随机字符串
+func randomString(n int) string {
+letters := []rune(“abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ”)
+s := make([]rune, n)
+for i := range s {
+s[i] = letters[rand.Intn(len(letters))]
+}
+return string(s)
+}
+// 生成随机数据并存入Redis
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {
+ctx := context.Background()
+for i := 0; i &lt; count; i&#43;&#43; {
+key := fmt.Sprintf(“key%d”, i)
+value := randomString(3) // 生成长度为3的随机字符串
+err := rdb.Set(ctx, key, value, 0).Err()
+if err != nil {
+panic(err)
+}
+}
+fmt.Printf(“Successfully generated and saved %d random data entries to Redis.\n”, count)
+}
+func main() {
+// 设置随机种子
+rand.Seed(time.Now().UnixNano())
+// 连接到Redis
+rdb := redis.NewClient(&amp;redis.Options{
+Addr: “localhost:6380”, // Redis服务器地址
+DB: 0, // 使用默认的DB
+})
+// 生成10000个随机数据并存入Redis
+generateDataAndSaveToRedis(rdb, 10000)
+}">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Wei Haoyu">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 前言 本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。 NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：
+sudo redis-server /etc/redis/redis.conf
+//启动redis6.0实例
+redis-cli -p 6380
+//连接redis6.0实例,6380为端口号
+redis-cli -p 6380 KEYS “key*” | xargs redis-cli -p 6380 DEL
+//删除redis6.0实例中以key*为前缀的所有key
+2. 使用go语言实现 2.1 生成随机数据并存入Redis 随机生成1万个单词，并写入redis数据库中：
+package main
+import (
+“context”
+“fmt”
+“math/rand”
+“time”
+“github.com/go-redis/redis/v8”
+)
+// 生成随机字符串
+func randomString(n int) string {
+letters := []rune(“abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ”)
+s := make([]rune, n)
+for i := range s {
+s[i] = letters[rand.Intn(len(letters))]
+}
+return string(s)
+}
+// 生成随机数据并存入Redis
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {
+ctx := context.Background()
+for i := 0; i &lt; count; i&#43;&#43; {
+key := fmt.Sprintf(“key%d”, i)
+value := randomString(3) // 生成长度为3的随机字符串
+err := rdb.Set(ctx, key, value, 0).Err()
+if err != nil {
+panic(err)
+}
+}
+fmt.Printf(“Successfully generated and saved %d random data entries to Redis.\n”, count)
+}
+func main() {
+// 设置随机种子
+rand.Seed(time.Now().UnixNano())
+// 连接到Redis
+rdb := redis.NewClient(&amp;redis.Options{
+Addr: “localhost:6380”, // Redis服务器地址
+DB: 0, // 使用默认的DB
+})
+// 生成10000个随机数据并存入Redis
+generateDataAndSaveToRedis(rdb, 10000)
+}">
+  <meta itemprop="wordCount" content="475">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Wei Haoyu">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 前言 本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。 NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：
+sudo redis-server /etc/redis/redis.conf
+//启动redis6.0实例
+redis-cli -p 6380
+//连接redis6.0实例,6380为端口号
+redis-cli -p 6380 KEYS “key*” | xargs redis-cli -p 6380 DEL
+//删除redis6.0实例中以key*为前缀的所有key
+2. 使用go语言实现 2.1 生成随机数据并存入Redis 随机生成1万个单词，并写入redis数据库中：
+package main
+import (
+“context”
+“fmt”
+“math/rand”
+“time”
+“github.com/go-redis/redis/v8”
+)
+// 生成随机字符串
+func randomString(n int) string {
+letters := []rune(“abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ”)
+s := make([]rune, n)
+for i := range s {
+s[i] = letters[rand.Intn(len(letters))]
+}
+return string(s)
+}
+// 生成随机数据并存入Redis
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {
+ctx := context.Background()
+for i := 0; i &lt; count; i&#43;&#43; {
+key := fmt.Sprintf(“key%d”, i)
+value := randomString(3) // 生成长度为3的随机字符串
+err := rdb.Set(ctx, key, value, 0).Err()
+if err != nil {
+panic(err)
+}
+}
+fmt.Printf(“Successfully generated and saved %d random data entries to Redis.\n”, count)
+}
+func main() {
+// 设置随机种子
+rand.Seed(time.Now().UnixNano())
+// 连接到Redis
+rdb := redis.NewClient(&amp;redis.Options{
+Addr: “localhost:6380”, // Redis服务器地址
+DB: 0, // 使用默认的DB
+})
+// 生成10000个随机数据并存入Redis
+generateDataAndSaveToRedis(rdb, 10000)
+}">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Wei Haoyu
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-前言">1. 前言</h1>
+<p>本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。
+NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：</p>
+<blockquote>
+<p>sudo redis-server /etc/redis/redis.conf<br>
+//启动redis6.0实例<br>
+redis-cli -p 6380<br>
+//连接redis6.0实例,6380为端口号<br>
+redis-cli -p 6380 KEYS &ldquo;key*&rdquo; | xargs redis-cli -p 6380 DEL<br>
+//删除redis6.0实例中以key*为前缀的所有key</p></blockquote>
+<h1 id="2-使用go语言实现">2. 使用go语言实现</h1>
+<h2 id="21-生成随机数据并存入redis">2.1 生成随机数据并存入Redis</h2>
+<p>随机生成1万个单词，并写入redis数据库中：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;context&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;math/rand&rdquo;<br>
+&ldquo;time&rdquo;<br>
+&ldquo;github.com/go-redis/redis/v8&rdquo;<br>
+)<br>
+// 生成随机字符串<br>
+func randomString(n int) string {<br>
+letters := []rune(&ldquo;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&rdquo;)<br>
+s := make([]rune, n)<br>
+for i := range s {<br>
+s[i] = letters[rand.Intn(len(letters))]<br>
+}<br>
+return string(s)<br>
+}<br>
+// 生成随机数据并存入Redis<br>
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {<br>
+ctx := context.Background()<br>
+for i := 0; i &lt; count; i++ {<br>
+key := fmt.Sprintf(&ldquo;key%d&rdquo;, i)<br>
+value := randomString(3) // 生成长度为3的随机字符串<br>
+err := rdb.Set(ctx, key, value, 0).Err()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+}<br>
+fmt.Printf(&ldquo;Successfully generated and saved %d random data entries to Redis.\n&rdquo;, count)<br>
+}<br>
+func main() {<br>
+// 设置随机种子<br>
+rand.Seed(time.Now().UnixNano())<br>
+// 连接到Redis<br>
+rdb := redis.NewClient(&amp;redis.Options{<br>
+Addr: &ldquo;localhost:6380&rdquo;, // Redis服务器地址<br>
+DB:   0,                // 使用默认的DB<br>
+})<br>
+// 生成10000个随机数据并存入Redis<br>
+generateDataAndSaveToRedis(rdb, 10000)<br>
+}</p></blockquote>
+<p>执行命令：go run Generate_random_data.go<br>
+<img src="../blogImg/MapReduce1.PNG" alt="Alt text"></p>
+<h2 id="22-读取redis数据到文件">2.2 读取Redis数据到文件</h2>
+<p>读取Redis数据到文件：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;bufio&rdquo;<br>
+&ldquo;context&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;os&rdquo;<br>
+&ldquo;github.com/go-redis/redis/v8&rdquo;<br>
+)<br>
+// 从Redis中读取所有数据<br>
+func fetchDataFromRedis(rdb <em>redis.Client) map[string]string {<br>
+ctx := context.Background()<br>
+keys, err := rdb.Keys(ctx, &ldquo;</em>&rdquo;).Result()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+data := make(map[string]string)<br>
+for _, key := range keys {<br>
+value, err := rdb.Get(ctx, key).Result()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+data[key] = value<br>
+}<br>
+return data<br>
+}<br>
+// 将数据写入到文件<br>
+func writeDataToFile(data map[string]string, filename string) {<br>
+file, err := os.Create(filename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+writer := bufio.NewWriter(file)<br>
+for key, value := range data {<br>
+fmt.Fprintf(writer, &ldquo;%s\t%s\n&rdquo;, key, value)<br>
+}<br>
+writer.Flush()<br>
+fmt.Printf(&ldquo;Data successfully written to %s\n&rdquo;, filename)<br>
+}<br>
+func main() {<br>
+// 连接到Redis<br>
+rdb := redis.NewClient(&amp;redis.Options{<br>
+Addr: &ldquo;localhost:6380&rdquo;, // Redis服务器地址<br>
+DB:   0,                // 使用默认的DB<br>
+})<br>
+// 从Redis中读取数据<br>
+data := fetchDataFromRedis(rdb)<br>
+// 将数据写入到文件作为MapReduce输入<br>
+writeDataToFile(data, &ldquo;input.txt&rdquo;)<br>
+}</p></blockquote>
+<p>执行命令：go run Read_data.go<br>
+<img src="../blogImg/MapReduce2.PNG" alt="Alt text"></p>
+<p>此时input.txt文件内容如下：<br>
+<img src="../blogImg/MapReduce3.PNG" alt="Alt text"></p>
+<h2 id="23-mapreduce实现">2.3 MapReduce实现</h2>
+<p>MapReduce实现：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;bufio&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;os&rdquo;<br>
+&ldquo;strings&rdquo;<br>
+)<br>
+// Map函数将读取输入文件，并输出每个单词的键值对（word, 1）<br>
+func mapFunction(filename string) map[string]int {<br>
+file, err := os.Open(filename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+wordCount := make(map[string]int)<br>
+scanner := bufio.NewScanner(file)<br>
+for scanner.Scan() {<br>
+line := scanner.Text()<br>
+// 假设输入文件每行的格式是 &ldquo;key\tvalue&rdquo;<br>
+parts := strings.Split(line, &ldquo;\t&rdquo;)<br>
+if len(parts) != 2 {<br>
+continue // 跳过格式不正确的行<br>
+}<br>
+value := parts[1]<br>
+words := strings.Fields(value)<br>
+for _, word := range words {<br>
+wordCount[word] += 1<br>
+}<br>
+}<br>
+if err := scanner.Err(); err != nil {<br>
+panic(err)<br>
+}<br>
+return wordCount<br>
+}<br>
+// Reduce函数将汇总Map函数的输出，计算每个单词的总次数<br>
+func reduceFunction(mappedData map[string]int) map[string]int {<br>
+reducedData := make(map[string]int)<br>
+for word, count := range mappedData {<br>
+reducedData[word] += count<br>
+}<br>
+return reducedData<br>
+}<br>
+// 将结果写入到文件中<br>
+func writeResultToFile(result map[string]int, outputFilename string) {<br>
+file, err := os.Create(outputFilename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+writer := bufio.NewWriter(file)<br>
+for word, count := range result {<br>
+fmt.Fprintf(writer, &ldquo;%s  %d\n&rdquo;, word, count)<br>
+}<br>
+writer.Flush()<br>
+}<br>
+func main() {<br>
+// Map阶段<br>
+mappedData := mapFunction(&ldquo;input.txt&rdquo;)<br>
+// Reduce阶段<br>
+reducedData := reduceFunction(mappedData)<br>
+// 输出结果到文件<br>
+writeResultToFile(reducedData, &ldquo;output.txt&rdquo;)<br>
+fmt.Println(&ldquo;MapReduce job completed. Results written to output.txt&rdquo;)<br>
+}</p></blockquote>
+<p>执行命令：go run MapReduce.go<br>
+<img src="../blogImg/MapReduce4.PNG" alt="Alt text"></p>
+<p>output.txt文件内容如下：<br>
+<img src="../blogImg/MapReduce5.PNG" alt="Alt text"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Wei Haoyu 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -97,6 +97,26 @@
   <div class="mb3 pa4 gray overflow-hidden bg-white">
     <span class="f6 db">Posts</span>
     <h1 class="f3 near-black">
+      <a href="/posts/hello-world/" class="link black dim">
+        Welcome!
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>I am Haoyu Wei. My passion lies in the architecture of search, ads, and recommender systems, with a sharp focus on refactoring, performance tuning, Retrieval-Augmented Generation (RAG), and CUDA kernel development.</p>
+<p>If my profile resonates with you, feel free to reach me at +86 134 6570 0709. My core belief: learn by doing.</p>
+
+    </div>
+    <a href="/posts/hello-world/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
       <a href="/posts/why/" class="link black dim">
         Background 
       </a>
@@ -146,22 +166,1103 @@ B.Eng. in Communication Engineering | Sep 2019 – Jun 2023</p>
   <div class="mb3 pa4 gray overflow-hidden bg-white">
     <span class="f6 db">Posts</span>
     <h1 class="f3 near-black">
-      <a href="/posts/hello-world/" class="link black dim">
-        Welcome!
+      <a href="/posts/3ts/" class="link black dim">
+        
       </a>
     </h1>
     <div class="nested-links f5 lh-copy nested-copy-line-height">
-      <p>I am Haoyu Wei. My passion lies in the architecture of search, ads, and recommender systems, with a sharp focus on refactoring, performance tuning, Retrieval-Augmented Generation (RAG), and CUDA kernel development.</p>
-<p>If my profile resonates with you, feel free to reach me at +86 134 6570 0709. My core belief: learn by doing.</p>
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="3ts">3TS</h1>
+<p><img src="../blogImg/1.png" alt="Alt text"></p>
+<h1 id="数据库中执行一致性测试">数据库中执行一致性测试</h1>
+<h1 id="1-postgresql安装">1. PostgreSQL安装</h1>
+<h2 id="11-下载-postgresql-15-的源码">1.1 下载 PostgreSQL 15 的源码</h2>
+<p><img src="../blogImg/2.png" alt="Alt text"></p>
+<pre tabindex="0"><code>wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz
+</code></pre><h2 id="12-解压源码包">1.2 解压源码包</h2>
+<p>解压下载的源码包：</p>
+<pre tabindex="0"><code>tar -xzvf postgresql-15.0.tar.gz
+</code></pre><h2 id="13-编译并安装-postgresql">1.3 编译并安装 PostgreSQL</h2>
+<p>进入源码目录，执行以下命令进行编译和安装：</p>
+<pre tabindex="0"><code>bash
+cd postgresql-15.0
+./configure
+make
+sudo make install
+</code></pre><h2 id="14-创建数据库用户和数据目录">1.4 创建数据库用户和数据目录</h2>
+<pre tabindex="0"><code>sudo mkdir /usr/local/pgsql
+sudo mkdir /usr/local/pgsql/data
+sudo chown nlove /usr/local/pgsql/data
+</code></pre><h2 id="15-初始化数据库">1.5 初始化数据库</h2>
+<p>初始化数据库:</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
+</code></pre><p><img src="../blogImg/3.png" alt="Alt text"></p>
+<h2 id="16-启动-postgresql-服务">1.6 启动 PostgreSQL 服务</h2>
+<p>启动 PostgreSQL 数据库服务：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start
+</code></pre><p><img src="../blogImg/4.png" alt="Alt text"><br>
+创建数据库 test：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/createdb test
+</code></pre><p>创建一个名为 test 的数据库。<br>
+连接到数据库 test：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/psql test
+</code></pre><p><img src="../blogImg/5.png" alt="Alt text"></p>
+<pre tabindex="0"><code>CREATE USER why WITH PASSWORD &#39;123&#39;;
+ALTER USER why CREATEDB;
+</code></pre><p><img src="../blogImg/6.png" alt="Alt text"></p>
+<h2 id="17-why用户赋予-create-权限">1.7 why用户赋予 CREATE 权限</h2>
+<pre tabindex="0"><code>GRANT CREATE ON SCHEMA public TO why;
+</code></pre><p><img src="../blogImg/7.png" alt="Alt text"></p>
+<h1 id="2-安装-unixodbc">2. 安装 UnixODBC</h1>
+<pre tabindex="0"><code>sudo apt-get install unixodbc unixodbc-dev
+odbcinst -j
+</code></pre><p><img src="../blogImg/8.png" alt="Alt text"><br>
+显示 ODBC 驱动程序和数据源配置文件的位置。</p>
+<h1 id="3-配置-odbc-数据源">3. 配置 ODBC 数据源</h1>
+<p>编辑两个配置文件：<code>/etc/odbcinst.ini</code> 和 <code>/etc/odbc.ini</code>。</p>
+<h2 id="31-配置-etcodbcinstini">3.1 配置 <code>/etc/odbcinst.ini</code></h2>
+<pre tabindex="0"><code>sudo nano /etc/odbcinst.ini
+插入
+[PostgreSQL]
+Description = PostgreSQL ODBC Driver
+Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libodbcpsqlS.so
+FileUsage = 1
+</code></pre><p><img src="../blogImg/9.png" alt=" "></p>
+<h2 id="32-配置-etcodbcini">3.2 配置 <code>/etc/odbc.ini</code></h2>
+<p>这个文件用于配置数据源名称 (DSN)，即指定你将要连接的 PostgreSQL 数据库。</p>
+<pre tabindex="0"><code>sudo nano /etc/odbc.ini
+[pg]
+Description = PostgreSQL Database
+Driver = PostgreSQL
+Servername = localhost
+Port = 5432
+Database = test
+Username = why
+Password = 123
+</code></pre><p><img src="../blogImg/10.png" alt="Alt text"></p>
+<h2 id="33-配置环境变量">3.3 配置环境变量</h2>
+<p>确保 ODBCINI 和 ODBCSYSINI 环境变量被正确设置，这可以帮助 isql 工具找到配置文件。</p>
+<pre tabindex="0"><code>export ODBCSYSINI=/etc
+export ODBCINI=/etc/odbc.ini
+</code></pre><h2 id="34-测试">3.4 测试</h2>
+<p><img src="../blogImg/11.png" alt="Alt text"></p>
+<h1 id="4-测试一致性">4. 测试一致性</h1>
+<p>修改<code>auto_test.sh</code>,<code>user</code>,<code>password</code>。<br>
+<img src="../blogImg/12.png" alt="Alt text"></p>
+<pre tabindex="0"><code>./auto_test.sh &#34;pg&#34; &#34;read-uncommitted&#34;
+./auto_test.sh &#34;pg&#34; &#34;read-committed&#34;
+./auto_test.sh &#34;pg&#34; &#34;repeatable-read&#34;
+./auto_test.sh &#34;pg&#34; &#34;serializable&#34;
+</code></pre><p><img src="../blogImg/13.png" alt="Alt text"></p>
+<p><img src="../blogImg/14.png" alt="Alt text"></p>
+<h1 id="5-mysql同理">5. MYSQL同理</h1>
+<h2 id="51-安装好mysql后需要去官网安装mysql的obdc驱动">5.1 安装好mysql后,需要去官网安装mysql的obdc驱动</h2>
+<p><a href="https://dev.mysql.com/downloads/repo/apt/">MySQL :: Download MySQL APT Repository</a></p>
+<h2 id="52-配置obdc数据源">5.2 配置obdc数据源</h2>
+<p><img src="../blogImg/15.png" alt="Alt text"></p>
+<h2 id="53-配置数据源名称">5.3 配置数据源名称</h2>
+<p><img src="../blogImg/16.png" alt="Alt text"></p>
+<h2 id="54-运行3ts测试-测试结果如下">5.4 运行3ts测试 测试结果如下</h2>
+<p><img src="../blogImg/17.png" alt="Alt text"></p>
 
     </div>
-    <a href="/posts/hello-world/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+    <a href="/posts/3ts/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
   </div>
 </div>
 
         </div>
       
-    </section></article>
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/bigtable-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>paper <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/4443.pdf">link</a></p>
+<h1 id="1-bigtable介绍">1. Bigtable介绍</h1>
+<p>Google的 Bigtable 是一种分布式存储系统，专门用于管理结构化数据，具有高度的可扩展性。<br>
+在许多方面，Bigtable类似于数据库:它与数据库共享许多实现策略。bigtables不支持完整的关系数据模型，相反，它为客户端提供了一个简单的数据模型，该模型支持对数据布局和格式的动态控制，并允许客户端推断底层存储中表示的数据的局部属性。使用可以是任意字符串的行名和列名对数据进行索引。Bigtable模式参数允许客户端动态控制从内存中还是从磁盘中提供数据。</p>
+<h1 id="2-数据模型">2. 数据模型</h1>
+<p>Bigtable是一个稀疏的、分布式的、持久的多维排序映射。映射由行键、列键和时间戳索引，映射中的每个值都是一个未解释的字节数组。</p>
+<p>稀疏的：Bigtable 表格是稀疏的，意味着在表格中不需要为每个行和列都填充数据。只在需要的位置存储数据，这样可以节省存储空间。空白的单元格不会占用资源。<br>
+分布式的：Bigtable 是分布式的，它可以将数据存储在成千上万台服务器上，每个表格会被分割成多个“tablet”（子表），并分布在不同的服务器上。<br>
+持久的：Bigtable 保证数据持久化，即数据被存储后不会丢失，甚至在服务器故障或重启的情况下，数据依然是安全的。这通过底层的 Google 文件系统（GFS）来实现。<br>
+多维排序映射：Bigtable 将数据组织为一个多维的结构，其中数据通过行键、列键和时间戳来定位。这类似于一个三维的哈希表，不同的键为不同维度的数据提供索引。<br>
+行键：行键是表中每一行的唯一标识符。行键按字典序排列，使得 Bigtable 能高效地执行按行范围查询。<br>
+列键：列键用于标识每一行中不同的列数据，列按列族（column family）组织，使得列键具有分组的灵活性。<br>
+时间戳：Bigtable 中的每个单元格（即某一行键和列键交叉的地方）可以存储同一数据的多个版本，每个版本都有一个时间戳。通过时间戳，Bigtable 可以存储历史版本的数据，支持按时间查询。<br>
+未解释的字节数组：映射中的每个值实际上是一个字节数组。Bigtable 不关心这些字节的具体内容，它不提供对数据类型的解释，数据的解析留给应用程序处理。<br>
+三维索引（行键、列键、时间戳）访问数据：<br>
+<code>(row:string, column:string, time:int64) → string</code></p>
+<h2 id="21-行键">2.1 行键</h2>
+<p>Bigtable的行键是任意字符串。对单行键下数据的每次读取或写入都是原子的。<br>
+按字典顺序维护数据：<br>
+Bigtable 使用 rowkey 来对数据进行排序，并按照字典顺序进行存储。这样，数据行在存储时是按行键（rowkey）的字典序排列的。<br>
+行范围动态分区：<br>
+Bigtable 会动态将表格中的行划分为多个连续的范围，每个范围称为一个“tablet”。这些 tablet 是系统在集群中的分配和负载平衡的最小单位。随着数据的增加或访问负载的变化，系统可以自动调整 tablet 的大小和位置。<br>
+短范围读取的有效性：<br>
+因为数据是按行键的字典顺序存储的，所以当我们查询特定范围的数据时，系统只需要从相关的几个 tablet 中读取数据。这意味着短范围读取（例如按范围查询相邻的行）通常只需要与少量的机器通信。<br>
+利用行键来优化数据访问的局部性：<br>
+客户端可以根据应用的需求来选择合适的行键，以便将相关的数据存储在连续的位置上，这样可以提高数据访问的局部性。例如，在一个 Webtable 中，可以通过倒置 URL 的主机名（如将 <code>maps.google.com</code> 变为 <code>com.google.maps</code>）来确保同一个域名下的页面（如 <code>maps.google.com/index.html</code>）被存储在相邻的行中。</p>
+<h2 id="22-列键">2.2 列键</h2>
+<p>列族（column families）：<br>
+列族是 Bigtable 数据存储的基本单元，每个列族中包含多个列键。列族是被分组在一起的数据集合，通常是数据类型相似的一组列。<br>
+访问控制：<br>
+Bigtable 在 列族级别 执行访问控制、磁盘和内存使用的管理。这意味着所有数据访问权限、资源管理都在列族级别进行，而不是单个列键级别。<br>
+列族的创建：<br>
+在向某个列族存储数据之前，必须先创建这个列族。一旦列族被创建，用户可以向该列族中添加任意的列键，也就是说列族创建后列键是动态的，不需要预定义。<br>
+列族数量有限：<br>
+虽然列键的数量是无穷大的（可以创建任意数量的列键），但列族的数量应该保持较小，通常在数百个以内。<br>
+限定符（qualifier） :<br>
+限定符是列键的一部分，负责标识具体的列。这可以帮助你在一个列族（column family）内区分多个列键。限定符是灵活的，可以是任意字符串，而列族名必须是可打印的字符。限定符允许同一个列族中存在多种不同类型的列键。</p>
+<h3 id="221-列族设计例子">2.2.1 列族设计例子</h3>
+<p>假设有一个用户数据表，可以设计为：<br>
+<code>列族A：存储用户的基本信息，比如用户名、年龄（这些信息类型相似，因此被压缩在一起）。</code><br>
+<code>列族B：存储用户的社交信息，比如好友列表、点赞记录（同样类型相似的数据放在一起）。</code><br>
+每个列族中的列键（如用户名、年龄、好友列表等）可以是无限的，但这些列键必须在已经创建的列族下添加。</p>
+<h3 id="222-限定符设计例子">2.2.2 限定符设计例子</h3>
+<p>假设有一个存储网页数据的表格，列族是 anchor，表示网页上的超链接信息。这个列族可能包含许多不同的链接，每个链接来自不同的网站。这时，可以通过使用不同的限定符来标识这些链接。比如：</p>
+<pre tabindex="0"><code>列族：anchor
+限定符：example.com，google.com，yahoo.com
+存储内容：各个链接的锚文本（也就是链接的显示文字）。
+更具体地说：
+anchor:example.com 存储了来自 example.com 指向当前页面的链接锚文本。
+anchor:google.com 存储了来自 google.com 的锚文本
+</code></pre><h2 id="23-时间戳">2.3 时间戳</h2>
+<p>多版本存储：<br>
+Bigtable 中的每个单元格可以存储同一数据的多个版本。<br>
+时间戳索引：<br>
+每个数据版本都使用一个 时间戳（timestamp） 作为索引。Bigtable 的时间戳是 64 位的整数，精度可以达到微秒级别。<br>
+自动分配：<br>
+Bigtable 可以自动生成时间戳，代表“实时”时间，单位为微秒。<br>
+手动分配：<br>
+应用程序也可以自己生成并分配时间戳，这样可以更灵活地控制版本。如果应用需要避免多个版本之间的冲突（比如多用户或多线程同时更新同一个单元格），应用程序需要确保生成唯一的时间戳。<br>
+按时间戳降序存储：<br>
+存储的数据版本按时间戳的降序排列，最新版本的数据会首先被读取。这意味着在查询单元格数据时，默认总是先获取最新的版本。</p>
+<h1 id="3-构建模块">3. 构建模块</h1>
+<p>Google File System (GFS)：<br>
+Bigtable 使用 GFS 来存储日志和数据文件。GFS 是一个分布式文件系统，专为大规模数据存储设计。Bigtable 将其日志文件和数据文件存储在 GFS 中。<br>
+集群管理系统：<br>
+Bigtable 集群运行在共享机器池中，这些机器同时运行其他分布式应用。Bigtable 依赖一个集群管理系统来调度作业、管理共享资源、处理机器故障，并监控机器的状态。<br>
+SSTable 文件格式：<br>
+Bigtable 内部使用 SSTable 文件格式 来存储数据。SSTable 是一种持久化、不可变的键值映射格式，提供从键到值的持久存储。SSTable 的特点是数据是有序的，不可变的。每个 SSTable 被分为多个块（默认块大小为 64KB），块索引存储在 SSTable 的末尾，并在 SSTable 打开时加载到内存中。通过内存中的索引进行二分查找，可以高效地找到数据块并执行一次磁盘查找来获取数据。 <br>
+Chubby 分布式锁服务：<br>
+Chubby 是 Bigtable 依赖的一个高可用、持久的分布式锁服务。Chubby 使用 Paxos 算法来保证多个副本之间的一致性。Chubby 服务通常由五个副本组成，其中一个被选举为主服务器，处理请求。只要多数副本可用并能互相通信，Chubby 服务就能继续运行。</p>
+<h1 id="4-实现">4. 实现</h1>
+<h2 id="41-bigtable-的三个主要组件">4.1 Bigtable 的三个主要组件</h2>
+<p>客户端库：<br>
+每个客户端都会链接一个库，这个库让客户端可以直接与 Tablet 服务器进行通信，处理读写操作。<br>
+主服务器（Master）：<br>
+主服务器负责管理整个 Bigtable 系统的元数据和协调工作，如 tablet 分配、检测和管理 tablet 服务器的增加或失效、负载均衡、以及在 GFS 上进行垃圾回收等任务。此外，主服务器还处理表结构的更改，比如表或列族的创建。<br>
+Tablet 服务器：<br>
+每个 Tablet 服务器负责管理一定数量的 tablet（通常一个 Tablet 服务器管理 10 到 1000 个 tablet）。它处理对这些 tablet 的读写请求，当某个 tablet 变得过大时，会自动将其分割成较小的 tablet。Tablet 服务器可以根据工作负载的变化动态添加或移除。</p>
+<h2 id="42-客户端与主服务器的通信">4.2 客户端与主服务器的通信</h2>
+<p>尽管系统采用了单主架构（即只有一个主服务器），但 客户端数据的读写操作并不通过主服务器。相反，客户端直接与 Tablet 服务器通信进行数据操作。客户端在进行读写操作时，也不依赖主服务器获取 tablet 位置信息。</p>
+<h2 id="43-表和tablet的关系">4.3 表和tablet的关系</h2>
+<p>Bigtable 中的每个集群存储多个表，每个表由多个 tablet 组成。tablet是表中一个特定行范围的数据存储单元。当表格开始时，通常只有一个 tablet，随着数据的增长，系统会自动将其分割成多个 tablet。</p>
+<h2 id="44-使用类似b树的三层层级结构存储tablet的位置信息">4.4 使用类似B+树的三层层级结构存储tablet的位置信息</h2>
+<p><img src="../blogImg/tablet%E4%BD%8D%E7%BD%AE%E4%BF%A1%E6%81%AF.PNG" alt="Alt text"><br>
+第一层：<br>
+Chubby 文件：Chubby 文件包含了根 tablet 的位置信息。根 tablet 是这棵 “tablet 位置树” 的起点。<br>
+第二层：<br>
+根 tablet：根 tablet 是一个特殊的元数据表中的第一个 tablet，它存储了所有元数据表的 tablet 位置。根 tablet 不会被拆分。<br>
+第三层：<br>
+METADATA 表：每个元数据表（METADATA tablet）存储了一组用户 tablet 的位置信息。这些用户 tablet 是实际存储用户数据的单元。除了存储位置信息外，METADATA 表还存储了关于每个 tablet 的事件日志（如某个服务器何时开始服务某个 tablet）。</p>
+<h2 id="45-查找tablet位置">4.5 查找tablet位置</h2>
+<p>客户端缓存：<br>
+客户端会缓存 tablet 的位置信息，以减少重复查询。每当客户端需要访问一个 tablet 时，它首先检查缓存，如果缓存信息无效，客户端会从缓存中向上回溯，依次查找直到找到正确的 tablet 位置。<br>
+网络查询过程：<br>
+如果客户端的缓存是空的，那么整个 tablet 位置查找过程可能需要三次网络查询（包括一次从 Chubby 读取的查询）。如果缓存过时，则可能需要多达六次查询。<br>
+预取优化：<br>
+预取：为了进一步减少网络查询的成本，客户端在读取元数据表时会预取多个 tablet 的位置信息。</p>
+<h2 id="46-bigtable如何分配tablet">4.6 bigtable如何分配tablet</h2>
+<h3 id="461-tablet分配">4.6.1 tablet分配</h3>
+<p>每个 tablet 都被分配给一个 tablet 服务器来处理。主服务器负责跟踪所有活跃的 tablet 服务器及其当前分配的 tablet。如果某个 tablet 未分配（unassigned），而有可用的服务器可以容纳这个 tablet，主服务器会向该服务器发送一个请求，要求其加载该 tablet。</p>
+<h3 id="462-chubby锁机制">4.6.2 Chubby锁机制</h3>
+<p>Bigtable 使用Chubby来跟踪和管理 tablet 服务器。每当一个 tablet 服务器启动时，它会在 Chubby 中创建一个唯一命名的文件，并获取该文件的独占锁。这个文件用于表明该服务器是活跃的，主服务器通过监控 Chubby 中的目录来发现新的服务器。<br>
+如果某个 tablet 服务器由于网络问题丢失了其 Chubby 会话，它将停止服务 tablet。Chubby 提供了一个有效的机制，允许 tablet 服务器检查其锁是否仍然有效，而不需要频繁进行网络通信。</p>
+<h3 id="463-服务器故障处理">4.6.3 服务器故障处理</h3>
+<p>如果一个 tablet 服务器终止服务（例如机器从集群中移除），它会尝试释放 Chubby 锁，以便主服务器能够更快地重新分配该服务器上托管的所有 tablet。<br>
+主服务器通过定期检查 tablet 服务器的锁状态来检测服务器是否已经失效。如果检测到某个服务器已经失去锁或无法联系到该服务器，主服务器会尝试获取该服务器文件的锁。如果成功获取，主服务器将确认该服务器不再服务，并将该服务器的文件删除。然后，主服务器会将该服务器上托管的所有 tablet 标记为“未分配”，以便重新分配。</p>
+<h3 id="464-master服务器的启动流程">4.6.4 Master服务器的启动流程</h3>
+<p>当主服务器启动时，它需要了解当前 tablet 的分配状态，以便在需要时重新分配 tablet。它执行以下步骤：</p>
+<pre tabindex="0"><code>1. 获取 Chubby 中的独占 master 锁，确保没有其他主服务器同时运行。  
+2. 扫描 Chubby 中的服务器目录，找到所有活跃的服务器。  
+3. 与每个活跃的 tablet 服务器通信，确认每个服务器已分配的 tablet。  
+4. 扫描元数据表（METADATA table）以了解所有的 tablet 列表。若某个 tablet 未分配，则将其标记为未分配，准备重新分配。  
+</code></pre><h3 id="465-root-tablet-和元数据表">4.6.5 Root tablet 和元数据表</h3>
+<p>扫描元数据表前，主服务器需要确保根 tablet 被分配，因为根 tablet 包含了所有元数据表的名称。若根 tablet 未分配，主服务器将其添加到未分配列表中，以确保其被分配。<br>
+通过扫描根 tablet，主服务器可以了解所有元数据表及其位置。</p>
+<h3 id="466-tablet-的创建和拆分">4.6.6 Tablet 的创建和拆分</h3>
+<p>一个 table 的 tablet 仅在以下情况改变：</p>
+<pre tabindex="0"><code>1. 新建或删除表。  
+2. 两个 tablet 合并为一个较大的 tablet。  
+3. 一个现有的 tablet 拆分为两个较小的 tablet。  
+tablet 拆分是由 tablet 服务器发起的，并通过更新元数据表来记录。服务器完成拆分后，会通知主服务器。如果通知丢失（如服务器或主服务器宕机），主服务器会在重新加载该 tablet 时自动检测到拆分并进行相应调整。  
+</code></pre><h2 id="47-bigtable-如何存储和管理-tablet-的持久化状态">4.7 Bigtable 如何存储和管理 tablet 的持久化状态</h2>
+<p><img src="../blogImg/TabletRepresentation.PNG" alt="Alt text"></p>
+<h3 id="471-持久化状态">4.7.1 持久化状态</h3>
+<p>Tablet 的持久化状态 是存储在 GFS 中的。Tablet 的更新记录会被提交到 commit log（提交日志）中，这个日志记录了所有的修改（称为 redo 记录），用于在系统崩溃或重启时恢复数据。<br>
+最近提交的更新会被存储在内存中的一个有序缓冲区，称为 memtable。更老的更新会被存储在磁盘上的 SSTable 文件中。</p>
+<h3 id="472-恢复tablet">4.7.2 恢复tablet</h3>
+<p>当 tablet 服务器需要恢复某个 tablet 时，它会从 METADATA 表 中读取该 tablet 的元数据。元数据包含组成该 tablet 的所有 SSTable 文件列表，以及一些 redo 点（指向 commit log 的位置，可能还包含 tablet 的数据）。<br>
+服务器将 SSTable 的索引加载到内存中，并通过应用从 redo 点之后的所有提交日志来重建 memtable。</p>
+<h3 id="473-写操作">4.7.3 写操作</h3>
+<p>当写操作到达 tablet 服务器时，服务器首先检查写入操作是否格式正确，并验证发送者是否有权限执行该操作。权限验证通过读取 Chubby 文件 中的授权列表来完成，通常这个检查是从 Chubby 客户端的缓存中进行的。<br>
+如果写入操作是有效的，数据会被写入 commit log。Bigtable 使用 group commit 技术来提高小量多次修改的吞吐量，减少磁盘写入的开销。<br>
+写入操作被提交后，数据会被插入到内存中的 memtable 中。</p>
+<h3 id="474-读操作">4.7.4 读操作</h3>
+<p>当读操作到达时，服务器同样检查读请求的格式是否正确，并验证发送者是否有权限读取数据。经过验证后，服务器会在 SSTable 和 memtable 的合并视图上执行读取操作。<br>
+因为 SSTable 和 memtable 都是按字典序排序的数据结构，所以合并视图可以高效地构建。</p>
+<h3 id="475-并发性">4.7.5 并发性</h3>
+<p>Tablet 的分裂（split）和合并（merge）操作可以在后台进行，而不会中断读写操作。</p>
+<h2 id="48-bigtable的压缩">4.8 Bigtable的压缩</h2>
+<p>读写操作在压缩过程中可以继续执行，不会中断操作。</p>
+<h3 id="481-小规模压缩minor-compaction">4.8.1 小规模压缩（Minor Compaction）</h3>
+<p>当 memtable 的大小超过阈值时，它会被冻结，并转换成一个 SSTable 文件，然后写入到 GFS 中。这一过程称为小规模压缩。<br>
+小规模压缩有两个目的：</p>
+<pre tabindex="0"><code>1. 减少内存使用：将 memtable 中的数据持久化到 SSTable，释放 tablet 服务器的内存。  
+2. 减少恢复时间：如果服务器崩溃，恢复时需要从日志中读取的内容会减少，因为部分数据已经存储在 SSTable 中，而不需要完全依赖 commit log。   
+</code></pre><h3 id="482-合并压缩merging-compaction">4.8.2 合并压缩（Merging Compaction）</h3>
+<p>每次小规模压缩都会生成一个新的 SSTable。如果长期不处理，读操作可能需要从多个 SSTable 中合并读取数据，增加查询复杂度。因此，系统会周期性地执行 合并压缩，在后台运行。<br>
+合并压缩 会读取多个 SSTable 的内容，以及 memtable 中的数据，合并它们并写入一个新的 SSTable。合并完成后，旧的 SSTable 和 memtable 可以被丢弃。</p>
+<h3 id="483-全局压缩major-compaction">4.8.3 全局压缩（Major Compaction）</h3>
+<p>全局压缩是一种特殊的合并压缩，它将所有的 SSTable 重新写入到一个新的 SSTable 中。全局压缩会清除所有的删除标记和被删除的数据。<br>
+删除标记：在非全局压缩过程中，SSTable 可能包含一些特殊的删除条目，这些条目用来标记哪些数据已经被删除。这些条目会覆盖旧的 SSTable 中仍然存在的数据，确保它们不会被读取。<br>
+全局压缩的作用：</p>
+<pre tabindex="0"><code>1. 回收删除数据所占用的存储资源。  
+2. 确保删除的数据完全从系统中消失，特别是对于存储敏感数据的服务来说，这一点非常重要。  
+</code></pre>
+    </div>
+    <a href="/posts/bigtable-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/bison%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-bison简介">1. Bison简介</h1>
+<p>Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。<br>
+Bison分为<a href="https://www.gnu.org/software/bison/">Linux版本</a>和<a href="https://gnuwin32.sourceforge.net/projects/bison.htm/">Windows版本</a>。</p>
+<h1 id="2-bison工作原理">2. Bison工作原理</h1>
+<h2 id="21-bison和flex协同工作">2.1 Bison和Flex协同工作</h2>
+<p><a href="Flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90.md">Flex</a>：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）<br>
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）<br>
+编译顺序：<br>
+<img src="../blogImg/Bison1.PNG" alt="图片1"><br>
+协同工作顺序：<br>
+<img src="../blogImg/Bison2.PNG" alt="图片2"></p>
+<h1 id="3-bison的输入">3. Bison的输入</h1>
+<p>Bison的输入为<code>*.y</code>文件：</p>
+<h2 id="31定义段">3.1定义段</h2>
+<ol>
+<li>以c语法写的一些定义和声明，该部分以符号<code>%{</code>和<code>%}</code>包裹。</li>
+<li>对词法的终结符和非终结符的声明，主要包含：<code>%token</code>,<code>%left</code>,<code>%right</code>,<code>%nonassoc</code>,<code>%union</code>,<code>%type</code>,<code>%start</code>。<br>
+<code>%token</code>定义语法中使用的终结符。</li>
+</ol>
+<p><code>%left</code>,<code>%right</code>,<code>%nonassoc</code>也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。<br>
+<code>%left</code>表示左结合，<code>%right</code>表示右结合，<code>%nonassoc</code>表示不可结合。</p>
+<p><code>%union</code>为c语言的联合类型，声明语法分析器中符号值的类型。</p>
+<pre tabindex="0"><code>%union {
+    int num;
+    char *str;
+}
+</code></pre><p>一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号<code>&lt;&gt;</code>中的联合类型的相应成员名来确定。<br>
+<code>%token &lt;num&gt; TOKEN1</code></p>
+<p><code>%type</code>定义语法中使用的非终结符。</p>
+<p><code>%start</code>定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。</p>
+<h2 id="32-语法规则段">3.2 语法规则段</h2>
+<p><img src="../blogImg/Bison3.PNG" alt="图片3"></p>
+<h2 id="33-辅助函数段">3.3 辅助函数段</h2>
+<p><img src="../blogImg/Bison4.PNG" alt="图片4"></p>
+
+    </div>
+    <a href="/posts/bison%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-flex的使用">1. Flex的使用</h1>
+<p>.l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。<br>
+c编译器默认生成名为a.out的可执行文件。<br>
+输入流经过a.out文件，输出词法单元序列。<br>
+<img src="../blogImg/Flex1.PNG" alt="图片1"></p>
+<h2 id="11-flex源程序的一般形式">1.1 Flex源程序的一般形式</h2>
+<p>三个部分：声明部分、转换规则、辅助函数。三个部分使用<code>%</code>分隔。 <br>
+声明部分包含名称声明及选项设置，其中<code>%{</code>和<code>%}</code>之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。<br>
+<img src="../blogImg/Flex2.PNG" alt="图片2"><br>
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。<br>
+<img src="../blogImg/Flex3.PNG" alt="图片3"><br>
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。<br>
+<img src="../blogImg/Flex4.PNG" alt="图片4"><br>
+<img src="../blogImg/Flex5.PNG" alt="图片5"><br>
+<img src="../blogImg/Flex6.PNG" alt="图片6"></p>
+<h2 id="12-flex处理二义性模式">1.2 Flex处理二义性模式</h2>
+<p><img src="../blogImg/Flex7.PNG" alt="图片7"></p>
+
+    </div>
+    <a href="/posts/flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/google-file-system/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>paper <a href="https://static.googleusercontent.com/media/research.google.com/en/us/archive/gfs-sosp2003.pdf">link</a></p>
+<h1 id="1-google-file-systemgfs介绍">1. Google File System(GFS)介绍</h1>
+<p>Google File System (GFS) 是谷歌为应对其大规模数据处理需求而开发的一种分布式文件系统。它的设计目标是高可扩展性和高容错性，能够在大量廉价的硬件设备上运行并提供高性能的数据存储解决方案。GFS 的特点是能够处理分布式数据密集型应用程序，适应如搜索引擎索引、大规模数据处理等需求。</p>
+<h1 id="2-设计">2. 设计</h1>
+<h2 id="21-接口">2.1 接口</h2>
+<p>GFS 提供了类似传统文件系统的接口，但没有实现标准的 API（例如 POSIX）。文件以路径名在目录中进行层次化组织，支持常见的文件操作，如创建、删除、打开、关闭、读取和写入。<br>
+除此之外，GFS 提供了两个关键操作：快照（Snapshot） 和 记录追加（Record Append）。<br>
+快照：<br>
+这个功能可以以低成本创建文件或目录树的副本。它特别适合在不占用过多存储资源的情况下，快速保存文件的某个版本或整个目录结构的副本。这对于数据的备份和版本管理非常有用。<br>
+记录追加：<br>
+允许多个客户端同时向同一个文件追加数据，并确保每个客户端的追加操作是原子性的，即不会被其他客户端的操作中断。这种设计非常适合像多路合并结果和生产者-消费者队列等应用场景，多个客户端可以在没有额外锁定机制的情况下，同时追加数据到同一文件。</p>
+<h2 id="22-架构">2.2 架构</h2>
+<p>GFS架构包括三个核心组件：<br>
+<img src="../blogImg/gfs1.PNG" alt="Alt text"></p>
+<h3 id="221-gfs-客户端">2.2.1 GFS 客户端</h3>
+<p>GFS 客户端与应用程序相连，负责处理来自应用程序的文件系统操作请求。<br>
+客户端不直接存储文件数据，而是通过与 GFS Master 和 GFS Chunkserver 的通信来读写数据。<br>
+对于每个请求，客户端会首先联系 Master 来获取文件块的元数据信息（例如，文件名、块位置、块句柄），然后直接与 Chunkserver 进行数据交互。<br>
+客户端会缓存一些元数据，减少与 Master 的交互次数，但不缓存实际文件数据，以避免缓存一致性问题。</p>
+<h3 id="222-gfs-master">2.2.2 GFS Master</h3>
+<p>GFS Master 是整个文件系统的核心管理组件，负责管理文件系统的元数据（如文件路径、块句柄与位置映射、访问控制等）。<br>
+当客户端发出请求时，Master 会返回块的位置和相应的 Chunkserver 列表，而具体的读写操作则在客户端与 Chunkserver 之间直接进行。
+Master 负责控制一些全局活动，比如块的租约管理（确保某个 Chunk 的副本一致性）、孤立块的垃圾回收、以及块在不同 Chunkserver 之间的迁移。<br>
+GFS Master 与每个 Chunkserver 定期通过“心跳”消息进行通信，发送指令并收集 Chunkserver 的状态信息。</p>
+<h3 id="223-gfs-chunkserver">2.2.3 GFS Chunkserver</h3>
+<p>Chunkserver 是负责实际存储文件块的组件，文件被分割成大小固定的块（默认为 64MB），每个块通过 Master 生成的唯一 64 位块句柄进行标识。<br>
+文件块被存储为 Linux 文件，并存储在 Chunkserver 的本地磁盘中。每个文件块默认会有三份副本存储在不同的 Chunkserver 上，以增强容错能力。<br>
+当客户端向 Chunkserver 请求读写数据时，基于块句柄和字节范围，Chunkserver 提供相应的块数据。<br>
+每个文件块有多个副本，系统通过这些副本来处理服务器故障，以确保数据的可靠性。</p>
+<h2 id="23-单一master">2.3 单一Master</h2>
+<p>在GFS中，使用单一 Master 来简化系统的设计，并利用 Master 的全局信息来做出复杂的块（chunk）放置和复制决策。然而，为了避免 Master 成为系统的瓶颈，必须尽量减少其在读写操作中的参与。</p>
+<h3 id="231-读操作流程">2.3.1 读操作流程</h3>
+<p>初始请求：<br>
+客户端（Client）首先通过文件名和字节偏移（byte offset）将应用程序请求翻译为文件内的块索引（chunk index）。然后客户端向 Master 发送请求，该请求包含文件名和块索引。<br>
+Master 返回信息：<br>
+Master 回复一个块句柄（chunk handle）和块副本所在的服务器地址。客户端将这些信息缓存下来，使用文件名和块索引作为键。<br>
+数据读取：<br>
+客户端选择其中一个副本服务器（通常是最近的一个）发送请求。请求中包含块句柄和要读取的字节范围。随后，客户端直接与 Chunkserver 进行数据交互，而不再通过 Master。<br>
+缓存机制：<br>
+对于同一文件块的后续读取，客户端不再与 Master 进行交互，直到缓存信息过期或者文件被重新打开。此外，客户端通常会在一次请求中查询多个块的元数据，而 Master 也可能返回紧随请求的块信息，这样可以避免未来的多次交互。</p>
+<h2 id="24-块大小chunk-size">2.4 块大小（Chunk Size）</h2>
+<p>在GFS中，块大小（Chunk Size） 是一个关键的设计参数，GFS 将每个块的大小设为 64 MB，这远大于传统文件系统中的块大小。</p>
+<h3 id="241-大块设计的优势">2.4.1 大块设计的优势</h3>
+<pre tabindex="0"><code>减少客户端与 Master 的交互：
+当客户端读取或写入同一个块时，只需要向 Master 发送一次请求以获取块位置信息。特别是对于读取和写入大文件的顺序操作，这种减少交互的好处尤为显著。即使是小范围的随机读取，客户端也能够舒适地缓存整个多 TB 工作集的块位置信息。
+减少网络开销：
+客户端对大块进行多次操作的几率更高，因此可以保持与 Chunkserver 的持续 TCP 连接，减少了每次操作时重新建立连接的网络开销。
+降低元数据的存储压力：
+每个文件由较少的块组成，减少了存储在 Master 上的元数据数量。由于元数据减少，Master 能够将所有元数据保存在内存中，从而提高系统的访问速度和性能。
+</code></pre><h3 id="242-大块设计的缺点">2.4.2 大块设计的缺点</h3>
+<pre tabindex="0"><code>对于小文件，由于只包含少量的块，可能只有少数几个 Chunkserver 存储了这些块。如果有大量客户端同时访问这些小文件，可能会导致这些 Chunkserver 成为“热点”，承受过多负载。
+</code></pre><p>为了解决这个批处理系统中的热点问题，GFS 采取了以下措施：</p>
+<pre tabindex="0"><code>增加此类可执行文件的副本数（即增加块的复制因子）。
+通过批处理系统的调度，错开应用程序的启动时间，避免同时大量请求。
+未来的潜在解决方案包括让客户端在类似情况下从其他客户端读取数据。
+</code></pre><h2 id="25-元数据">2.5 元数据</h2>
+<p>在 GFS 中，Master 存储了三种主要类型的元数据：</p>
+<pre tabindex="0"><code>文件和块命名空间：
+这是文件系统中的路径结构，记录了所有文件和块的层次化结构，即文件名和块名。
+文件到块的映射：
+这是文件和它们所对应的块之间的映射关系。Master 需要知道每个文件包含哪些块，以便能指导客户端去正确的 Chunkserver 获取数据。
+每个块的副本位置信息：
+这记录了每个块的副本存储在哪些 Chunkserver 上。
+</code></pre><p>前两类元数据（命名空间和文件到块的映射）是持久化存储的。Master 会将它们的更改（称为“变更”）记录在操作日志中，该日志存储在 Master 的本地磁盘上，并在远程机器上有副本。这种日志记录机制使得 Master 的状态更新简单可靠，即使 Master 崩溃，也能通过日志恢复数据一致性。<br>
+块位置信息并不持久化。Master 在启动时会向每个 Chunkserver 请求其拥有的块信息，当有新的 Chunkserver 加入集群时，也会进行相应更新。</p>
+<h3 id="251-元数据存储在内存中">2.5.1 元数据存储在内存中</h3>
+<p>在 GFS 中，Master 将元数据存储在内存中，这使得 Master 的操作非常快速。由于元数据直接保存在内存中，Master 可以轻松地定期在后台扫描其所有状态数据。这些周期性扫描用于实现一些关键功能，例如：<br>
+垃圾块回收：当某些块不再需要时，Master 可以通过扫描发现这些块并将其删除。<br>
+再复制：如果某个 Chunkserver 发生故障，Master 可以检测到这些块缺失并触发副本的再复制。<br>
+块迁移：为平衡 Chunkserver 之间的负载和磁盘使用率，Master 可以执行块迁移操作。</p>
+<h3 id="252-chunk位置">2.5.2 Chunk位置</h3>
+<p>在 GFS 中，Master 并不会持久保存每个块的副本位置信息。相反，当 Master 启动时，它通过轮询各个 Chunkserver 来获取这些信息。之后，Master 通过控制块的放置以及定期与 Chunkserver 进行的心跳消息（HeartBeat）保持最新的块位置信息。</p>
+<h3 id="253-操作日志">2.5.3 操作日志</h3>
+<p><img src="../blogImg/gfs2.PNG" alt="Alt text"><br>
+串行成功（Serial Success）：</p>
+<pre tabindex="0"><code>写操作：当写操作顺序完成时，文件区域的状态是已定义的（defined），即数据被准确写入，结果是确定的。
+记录追加操作：当多个客户端进行记录追加操作时，它们的数据可以成功地附加到文件末尾，但不同客户端的数据可能交错在一起。因此，文件区域的状态是部分一致且不一致（inconsistent interspersed），因为数据可能按不确定的顺序混合在一起。
+</code></pre><p>并发成功（Concurrent Success）：</p>
+<pre tabindex="0"><code>写操作：当多个客户端同时成功写入同一区域时，结果是一致的但未定义的（consistent but undefined）。虽然所有写入的结果是稳定的，但由于没有明确的顺序，文件最终的内容可能不确定。
+记录追加操作：在并发追加成功的情况下，文件区域是不一致的（inconsistent），因为可能存在交错的操作。
+</code></pre><p>失败（Failure）：</p>
+<pre tabindex="0"><code>写操作和记录追加操作在失败的情况下，文件区域会处于不一致的（inconsistent）状态，即数据的写入或追加可能部分完成，导致文件内容不完整或错误。
+</code></pre><p>GFS 的操作日志记录了关键的元数据更改,它不仅是唯一持久化元数据的记录，还通过逻辑时间线来定义并发操作的顺序。Master 在每次更改元数据时会将这些变化记录到操作日志中，并将日志复制到远程机器，如果 Master 崩溃，它会通过重放操作日志来恢复文件系统的状态。</p>
+<p>为了减少启动时间，Master 会在日志文件达到一定大小时，进行检查点（checkpoint）的保存。检查点包含了元数据的当前状态，Master 可以通过加载最新的检查点并重放之后的日志记录来快速恢复状态。</p>
+<h2 id="26-一致性模型">2.6 一致性模型</h2>
+<p>在GFS中，采用了宽松的一致性模型，这非常适合高度分布式的应用程序。</p>
+<h3 id="261-一致性保证">2.6.1 一致性保证</h3>
+<p>定义一致性（Defined Consistency）：<br>
+在串行成功的操作中，写入操作和记录追加操作的结果是确定的，即文件区域的内容与期望的写入值一致。<br>
+一致但未定义（Consistent but Undefined）：<br>
+当多个客户端并发地写入同一区域时，GFS 保证最终的文件内容是一致的，但不保证具体的写入顺序，因此文件的最终状态是未定义的。<br>
+不一致（Inconsistent）：<br>
+在写入失败或发生冲突时，文件的某些区域可能处于不一致的状态，即无法确定文件区域的内容。<br>
+命名空间变更的原子性：<br>
+GFS 保证了文件命名空间的变更（例如创建或删除文件）是原子的。由于这些操作都是由 Master 独立处理的，使用了命名空间锁机制确保原子性和正确性。此外，Master 的操作日志定义了全局的操作顺序，使得并发操作有序可控。<br>
+故障处理与副本一致性：<br>
+为了确保一致性，GFS 对每个块的副本按相同的顺序应用变更操作，并通过块的版本号来检测和标记失效副本。如果某个 Chunkserver 在变更时未能及时同步，系统会将其副本标记为过时，确保它不再参与后续的变更操作或提供给客户端读取请求。过时的副本会尽早被垃圾回收。
+GFS 通过定期的“心跳”通信检测 Chunkserver 的状态，并使用校验和机制来检测数据损坏。一旦检测到故障，系统会尽快从其他有效副本中恢复数据。<br>
+缓存与过时副本：<br>
+客户端缓存从 Master 获取的块位置信息。虽然客户端可能在缓存过期前读取到过时的副本，但这种情况通过缓存的超时机制和文件重新打开时清除缓存来限制。对于大多数顺序追加的文件，过时副本通常返回的是文件块的提前结束信息，而不是过时的数据。</p>
+<h3 id="262-数据变更类型">2.6.2 数据变更类型</h3>
+<p>GFS 支持两种主要的数据变更操作：写入和记录追加：<br>
+写入操作：<br>
+客户端可以在文件的指定偏移处写入数据，数据在同一偏移处可能被多个客户端并发写入，从而可能产生未定义的区域。<br>
+记录追加操作：<br>
+客户端可以向文件的末尾追加数据，GFS 确保每个追加操作至少成功一次，即使发生并发变更。记录追加操作是原子的，但追加的位置由 GFS 决定，返回给客户端的偏移标记了定义区域的开始。GFS 可能在追加数据之间插入填充或重复记录，这些部分通常被认为是不一致的区域。</p>
+<h3 id="263-对应用的影响">2.6.3 对应用的影响</h3>
+<p>依赖追加而非覆盖：<br>
+大多数 GFS 应用程序通过追加数据来变更文件，而不是覆盖已有数据。<br>
+检查点和校验：<br>
+应用程序会在写入过程中使用检查点（checkpointing）来标记数据的一致状态。检查点可以包含应用程序级别的校验和，帮助读者验证文件的完整性。读者只会处理到最后一个检查点的文件区域，因为该区域是已知的定义状态。<br>
+自验证、自标识的记录：<br>
+对于并发追加数据的情况，例如多个客户端同时向文件中追加数据，应用程序使用记录追加（Record Append）来保证每个写入至少成功一次。这种操作通常用于合并结果或生产者-消费者队列。为了处理由于并发追加产生的填充数据和重复数据，每条记录都包含额外信息（如校验和），帮助读者验证其有效性并识别无效的填充或记录片段。<br>
+<code>如果重复数据可能导致问题，应用程序可以通过唯一标识符（例如用于标识 Web 文档的 ID）来过滤重复项。</code><br>
+高效且恢复能力强：<br>
+这种基于追加和检查点的模型不仅比随机写入更加高效，还能帮助应用程序在失败后增量重启，确保读者不会处理不完整的数据。</p>
+<h1 id="3-系统交互">3. 系统交互</h1>
+<p>GFS系统设计时，主要减少了Master对所有操作的参与。</p>
+<h2 id="31-租约机制和变更顺序">3.1 租约机制和变更顺序</h2>
+<p>在GFS中，租约机制用于在副本之间保持一致的变更顺序。租约的机制确保所有副本按相同的顺序应用变更（mutation），从而保证数据的一致性。</p>
+<p><img src="../blogImg/gfs3.PNG" alt="Alt text"><br>
+写操作流程：</p>
+<pre tabindex="0"><code>1. 客户端请求租约信息：
+客户端首先向 Master 询问哪个 Chunkserver 持有该块（chunk）的当前租约（lease），以及其他副本的位置信息。如果当前没有租约，Master 会选择一个副本并授予它租约（不显示在图中）。
+
+2. Master 响应客户端：
+Master 向客户端回复持有租约的 Chunkserver（即 Primary 副本）以及其他副本（Secondary 副本）的位置信息。客户端将这些信息缓存，直到 Primary 无法访问或失去租约时，才需要再次联系 Master。
+
+3. 客户端推送数据到所有副本：
+客户端将数据推送到所有副本（包括 Primary 和 Secondary）。这可以按任意顺序进行。每个 Chunkserver 会将接收到的数据存储在内部的 LRU 缓存中，直到该数据被使用或逐渐被淘汰。
+
+4. 客户端发送写请求给 Primary：
+一旦所有副本确认接收到数据，客户端会向 Primary 发送写请求。此请求标识之前推送的数据。Primary 将为接收到的变更分配连续的序列号，确保变更按顺序应用。
+
+5. Primary 将写请求转发给 Secondary 副本：
+Primary 将写请求按照分配的序列号顺序转发给所有 Secondary 副本，确保所有副本以相同的顺序应用变更。
+
+6. Secondary 副本确认操作完成：
+Secondary 副本完成变更操作后，向 Primary 确认已完成操作。
+
+7. Primary 向客户端回复：
+Primary 在收到所有 Secondary 副本的确认后，向客户端发送确认回复。如果在任何副本上遇到错误，错误会报告给客户端。如果写操作在 Primary 或部分副本上失败，客户端会认为写操作失败，并将受影响的文件区域标记为不一致。客户端代码会重试该变更操作，通常在步骤 3 到 7 之间进行多次重试，如果仍然失败，则从写操作的起始位置重试。
+</code></pre><p>租约机制：<br>
+Master 授予租约给某个副本（Primary），使其负责为该块的变更操作分配顺序。其他副本（Secondary）会按照这个顺序应用变更。<br>
+数据流与控制流分离：<br>
+客户端在将数据推送到副本后，再进行写操作的控制流。这种分离使得系统能够根据网络拓扑结构优化数据传输，而不必依赖 Primary 的位置。<br>
+一致性与未定义状态：<br>
+即使多个客户端同时写入文件，只要所有副本按照相同的顺序完成操作，最终结果将是一致的。不过，由于并发操作，文件可能会包含来自不同客户端的片段，导致该区域的一致性是未定义的。</p>
+<h2 id="32-数据流">3.2 数据流</h2>
+<p>在 GFS 中，数据流（Data Flow） 和 控制流（Control Flow） 是分离的，目的是有效利用网络资源，提高数据传输效率。这种设计的具体目标包括充分利用每台机器的网络带宽、避免网络瓶颈和高延迟链路、以及将数据传输的延迟最小化。<br>
+控制流：<br>
+客户端向 Primary 副本发送控制指令（如写入请求），然后 Primary 将指令按序传递给 Secondary 副本。控制流从客户端流向 Primary，再依次流向所有 Secondary。</p>
+<p>数据流：<br>
+数据以线性的方式沿着选定的 Chunkserver 链条传输。这种方式通过流水线机制进行数据传输，充分利用每台机器的网络带宽，尽量避免网络中的瓶颈和高延迟链路。</p>
+<p>线性数据推送：<br>
+数据不是像树状拓扑那样同时分发到多个节点，而是沿着一条链式拓扑逐个推送。通过这种方式，每个 Chunkserver 的全部出站带宽可以被用于将数据尽快传递到下一个 Chunkserver，而不是分给多个接收方，从而最大化网络带宽的利用。</p>
+<p>避免网络瓶颈：<br>
+为了避免通过网络交换机等高延迟和网络瓶颈，数据按照网络拓扑中“最近”的机器顺序传递。每个 Chunkserver 会将数据转发给它最近的、尚未收到数据的机器，这样能够避免远程链路带来的延迟。</p>
+<p>流水线传输：<br>
+GFS 利用 TCP 连接的流水线机制来降低延迟。一旦某个 Chunkserver 接收到部分数据，它立即开始向下一个 Chunkserver 转发。</p>
+<h2 id="33-原子记录追加">3.3 原子记录追加</h2>
+<p>原子记录追加（Atomic Record Append）是 GFS 中提供的一种特殊操作，用于解决并发写入同一文件时的竞争问题。传统写操作中，客户端会指定数据写入的偏移量，而多个客户端同时写入相同区域可能导致数据混乱和碎片化。而在 Record Append 操作中，客户端只需指定数据，GFS 负责将数据原子性地追加到文件末尾，并选择合适的偏移量返回给客户端。</p>
+<h3 id="331-工作原理">3.3.1 工作原理</h3>
+<pre tabindex="0"><code>1. 数据推送：  
+客户端将数据推送到文件最后一个块的所有副本。
+2. 写入到 Primary：
+客户端发送请求到 Primary 副本。Primary 检查当前块是否有足够的空间容纳新数据。
+如果块已接近最大大小（64 MB），Primary 会将块填充到最大大小并通知副本，然后让客户端重试在下一个块上追加数据。
+如果数据可以写入，Primary 将数据追加到其副本，并指示 Secondary 副本在相同的偏移位置写入数据，最后向客户端确认成功。
+3. 失败处理：
+如果写入某个副本时失败，客户端会重试。因此，同一个块的不同副本可能会包含重复的数据或部分记录。GFS 不保证所有副本的字节内容完全一致，但保证数据至少会作为一个原子单位写入一次。
+</code></pre><p>成功的 Record Append 操作后，数据所在的区域被视为已定义的，即一致且可预测的。<br>
+在并发追加中，不同客户端追加的数据可能导致插入的顺序不同，但它们的偏移量和范围是有序的。</p>
+<h2 id="34-快照snapshot">3.4 快照（Snapshot）</h2>
+<p>GFS中，快照操作（Snapshot）用于几乎瞬时地复制文件或目录树，且对正在进行的变更（mutations）产生的中断最小。用户可以使用快照来快速创建数据集的分支副本，或者在进行实验性更改前对当前状态进行检查点保存，之后可以方便地提交更改或回滚。</p>
+<h3 id="341-实现机制">3.4.1 实现机制</h3>
+<p>GFS 使用了<code>写时复制（Copy-on-Write）</code>技术来实现快照，具体步骤如下：</p>
+<pre tabindex="0"><code>1. 撤销租约（Lease Revocation）：
+当 Master 接收到快照请求时，它首先撤销文件块的现有租约。这确保了任何后续写入操作在访问这些块时必须与 Master 进行交互。这样 Master 可以在写入发生前，首先创建该块的新副本。
+
+2. 日志记录：
+租约被撤销或失效后，Master 将快照操作记录到磁盘中，确保其持久性。然后，Master 会在内存中应用该日志记录，通过复制源文件或目录树的元数据来更新状态。
+
+3. 共享块：
+新创建的快照文件最初会指向与源文件相同的块。这样，快照操作不会立即创建新的物理数据副本，避免了数据的大量复制，节省了时间和存储资源。
+
+4. 写时复制：
+当客户端在快照操作后首次写入某个块时，它会向 Master 发送请求以查找当前的租约持有者。Master 发现该块的引用计数大于 1，即该块同时被多个文件引用。此时，Master 会生成一个新的块句柄，并要求持有原始块副本的 Chunkserver 创建一个新的块副本。新块创建在与原始块相同的 Chunkserver 上，以便数据可以在本地复制而不是通过网络传输。磁盘传输速度比网络快得多，避免了网络带宽的瓶颈。
+
+5. 正常处理：
+从此时起，后续的处理就和对普通块的操作没有区别。Master 会将新块的租约授予某个副本，并回复客户端，客户端可以像往常一样写入数据，而无需知道该块实际上是从现有块复制而来的。
+</code></pre><h3 id="342-优势">3.4.2 优势</h3>
+<p>这种快照机制提供了快速且高效的文件复制方法，特别适合处理大规模数据集，避免了直接复制数据导致的性能问题。</p>
+<h1 id="4-master操作">4. Master操作</h1>
+<p>在 GFS 中，Master 执行所有的命名空间操作，同时负责管理系统中的块（chunk）副本。其主要职责包括以下几方面：<br>
+命名空间操作：</p>
+<pre tabindex="0"><code>Master 处理所有涉及文件和目录的命名空间操作（如文件创建、删除、重命名等）。它通过管理命名空间元数据来确保文件系统的一致性和正确性。 
+</code></pre><p>块副本管理：</p>
+<pre tabindex="0"><code>块放置决策：  
+Master 决定新的块副本应该放置在哪些 Chunkserver 上。它考虑了负载均衡和数据可靠性等因素，确保副本分布均匀且具备容错能力。
+块创建与复制：  
+当需要创建新的块或副本时，Master 负责协调 Chunkserver 创建这些块，并确保它们被正确地复制到多个服务器上。
+</code></pre><p>系统协调：</p>
+<pre tabindex="0"><code>副本保持与复制：
+Master 持续监控系统中的块副本数量，确保每个块的副本数目达到预定值。当某个 Chunkserver 失效或副本丢失时，Master 会协调复制更多的副本以确保数据的高可用性。
+负载均衡：
+Master 监控每个 Chunkserver 的负载情况，努力将负载分配均匀，避免单个服务器过载。
+存储回收：
+Master 还负责回收未使用的存储资源。例如，当文件或块不再需要时，Master 会安排 Chunkserver 删除这些块以释放存储空间。
+</code></pre><h2 id="41-命名空间管理和锁机制">4.1 命名空间管理和锁机制</h2>
+<p>在 GFS 中，命名空间管理和锁机制确保了多个并发操作可以安全、高效地执行，特别是在复杂操作（例如快照）执行时不会阻塞其他操作。<br>
+命名空间管理：<br>
+GFS 没有传统文件系统中的每目录数据结构，也不支持硬链接或符号链接。相反，它将命名空间逻辑上表示为一张查找表，将完整路径名映射到文件的元数据。<br>
+为了提高内存效率，GFS 使用前缀压缩来表示这些路径名，以减少内存占用。<br>
+锁机制：<br>
+每个命名空间树的节点（即文件或目录的绝对路径）都与一个读写锁相关联。Master 操作会在执行前获取一组锁，以确保操作的序列化。例如，涉及路径 <code>/d1/d2/.../dn/leaf</code> 的操作会获取这些路径上的读锁或写锁，以确保路径和节点的正确访问。<br>
+这种锁机制允许在同一目录中的并发操作。例如，多个文件可以在同一目录下并发创建。每个创建操作只需获取目录名的读锁和文件名的写锁。这可以防止目录被删除、重命名或快照化，但不会阻止文件的创建。<br>
+为防止死锁，锁会按一致的全局顺序获取。锁首先按命名空间树中的层次级别排序，然后在同一层次内按字典序排序。</p>
+<h3 id="411-示例防止冲突操作">4.1.1 示例：防止冲突操作</h3>
+<p>当 <code>/home/user </code>目录正在快照到<code>/save/user</code>时，另一个操作试图在 <code>/home/user </code>下创建文件<code> /home/user/foo</code>，锁机制如何防止冲突：<br>
+快照操作会在 <code>/home</code> 和 <code>/save</code> 目录上获取读锁，并在<code> /home/user</code> 和 <code>/save/user </code>上获取写锁。<br>
+创建文件操作会在 <code>/home</code> 和 <code>/home/user</code> 上获取读锁，并在 <code>/home/user/foo </code>上获取写锁。<br>
+由于两者都需要在<code> /home/user</code> 上获取不同的锁，这两个操作会被正确序列化。</p>
+<h2 id="42-块创建chunk-creation重新复制re-replication-和-重新平衡rebalancing">4.2 块创建（chunk creation）、重新复制（re-replication） 和 重新平衡（rebalancing）</h2>
+<p>在 GFS 中，块副本的创建有三种主要原因：块创建（chunk creation）、重新复制（re-replication） 和 重新平衡（rebalancing）。</p>
+<h3 id="421-块创建chunk-creation">4.2.1 块创建（chunk creation）</h3>
+<p>当 Master 创建一个块时，它会决定副本放置在哪些 Chunkserver 上。以下几个因素会影响副本的放置：</p>
+<pre tabindex="0"><code>磁盘空间利用率：
+Master 会优先选择那些磁盘利用率低于平均水平的 Chunkserver，以平衡整个集群的磁盘利用率。
+限制在每个 Chunkserver 上的创建操作数：
+虽然创建块本身很便宜，但它往往会预示即将到来的大量写入流量，因为在 GFS 的“写一次，读多次”的工作负载模式下，块一旦写满后，通常会变为只读。因此，Master 会限制每个 Chunkserver 上的块创建数。
+跨机架分布：
+为了提高容错能力，块副本会分布在不同的机架上，防止单个机架故障时丢失所有副本。
+</code></pre><h3 id="422-重新复制re-replication">4.2.2 重新复制（re-replication）</h3>
+<p>当块的副本数量低于用户设定的复制目标时，Master 会立即启动重新复制。这可能是因为 Chunkserver 不可用、块副本可能已损坏、磁盘出现错误、或者复制目标增加。重新复制操作的优先级根据以下因素进行排列：</p>
+<pre tabindex="0"><code>与复制目标的差距：
+优先处理那些与复制目标差距较大的块。例如，丢失两个副本的块比只丢失一个副本的块优先级更高。
+文件活跃度：
+优先重新复制属于活跃文件的块，而不是那些属于已删除文件的块。
+阻塞客户端进度的块：
+如果某个块的缺失阻碍了客户端的进度，该块的优先级会被提升。
+</code></pre><p>Master 选择最高优先级的块，并指示某个 Chunkserver 从现有的有效副本复制数据，生成新的副本。新副本的放置规则类似于创建块时的标准：平衡磁盘空间利用、限制每个 Chunkserver 上的克隆操作，并将副本分布在不同的机架上。</p>
+<h3 id="423-重新平衡rebalancing">4.2.3 重新平衡（rebalancing）</h3>
+<p>Master 会定期检查副本分布，并移动副本以实现更好的磁盘空间和负载均衡。Master 通过这种方式，逐步填充新加入的 Chunkserver，而不是立即向其分配大量块及写入流量。副本重新平衡的标准与副本创建类似，同时 Master 会选择需要删除的现有副本，通常优先删除那些位于磁盘空间较少的 Chunkserver 上的副本，以平衡集群的磁盘使用情况。</p>
+<h2 id="43-垃圾回收">4.3 垃圾回收</h2>
+<p>在 GFS 中，垃圾回收（Garbage Collection）是为了释放文件删除后所占用的物理存储空间，但它不是立即执行的，而是懒惰地进行，在常规的垃圾回收过程中处理。<br>
+垃圾回收过程：</p>
+<pre tabindex="0"><code>文件级别的回收：
+当文件被删除后，文件不会立即从系统中移除，而是先被标记为“已删除”，在之后的垃圾回收过程中真正回收这些文件的存储空间。
+块级别的回收：
+删除文件时，相关的块数据也不会立刻被移除。垃圾回收会定期检查哪些块不再被引用，并逐步回收它们的存储空间。
+</code></pre><p>延迟回收的好处：</p>
+<pre tabindex="0"><code>简化系统设计：
+垃圾回收不需要与文件删除操作同步进行，减少了对系统的复杂性。
+提高可靠性：
+通过定期的垃圾回收，系统能够更加稳定地管理和释放存储资源，而不会因频繁的文件删除导致系统不稳定。
+</code></pre><p>垃圾回收的触发时机：<br>
+GFS 定期触发垃圾回收操作，以查找和移除不再使用的块数据。</p>
+<h3 id="431-垃圾回收具体机制">4.3.1 垃圾回收具体机制</h3>
+<pre tabindex="0"><code>文件重命名：
+当文件被删除时，Master 会将文件重命名为一个隐藏文件，名称包含删除时间戳。这个文件不会立即被移除，而是保留一定的时间（默认三天，但可以配置）。在此期间，文件仍可以通过其隐藏名称读取，如果需要，可以通过重命名将其恢复。
+定期扫描：
+Master 定期扫描文件系统的命名空间。如果某个文件的隐藏状态持续超过预定的时间（例如三天），Master 会将该文件从命名空间中移除。这时，文件的元数据会被清除，切断该文件与其块（chunks）的链接。
+块的清除：
+在对文件命名空间进行扫描的同时，Master 也会扫描块命名空间，查找“孤立的块”（即不再被任何文件引用的块）。这些块的元数据会被 Master 清除。
+Chunkserver 回收：
+在 Master 与 Chunkserver 之间定期交换的 HeartBeat 消息中，Chunkserver 会报告其持有的块。Master 回复该 Chunkserver，告知哪些块已经不在 Master 的元数据中记录。之后，Chunkserver 可以自由地删除这些块的副本。
+</code></pre><h3 id="432-垃圾回收的简化">4.3.2 垃圾回收的简化</h3>
+<p>引用管理简单：<br>
+所有对块的引用都存储在由 Master 维护的文件到块的映射中。因此，Master 可以轻松识别哪些块不再有引用，并将其标记为孤立块。<br>
+副本管理：<br>
+块的副本在 Chunkserver 上以 Linux 文件的形式存在，任何未被 Master 识别的副本都被视为“垃圾”副本。这些副本可以通过垃圾回收机制定期清理。</p>
+<h3 id="433-垃圾回收简化的优缺点">4.3.3 垃圾回收简化的优缺点</h3>
+<p>优点：</p>
+<pre tabindex="0"><code>简化和可靠性：
+垃圾回收避免了在创建或删除副本时需要立即通知所有 Chunkserver 的复杂性。如果在创建块或删除副本的过程中出现失败或通信丢失，Master 仍可以通过后续的垃圾回收机制清理这些残留的副本。
+背景批量处理：
+垃圾回收与 Master 的其他后台任务（如命名空间扫描和与 Chunkserver 的握手）一起进行，因此在系统负载较轻时进行清理，避免影响前台的客户端请求。
+防止误删：
+由于垃圾回收有一定的延迟，用户在误删文件时有机会通过恢复隐藏文件重新获取数据，从而提供了一种安全网，避免了不可逆的删除操作。
+</code></pre><p>缺点：</p>
+<pre tabindex="0"><code>延迟回收影响资源优化：当系统存储空间紧张时，垃圾回收的延迟可能会阻碍用户优化存储使用。例如，应用程序频繁创建和删除临时文件时，可能无法立即重用被删除文件所占的空间。
+</code></pre><h2 id="44-过时副本检测stale-replica-detection">4.4 过时副本检测（Stale Replica Detection）</h2>
+<p>在 GFS 中，过时副本检测是用来确保 Chunkserver 上的块副本保持最新的一个机制。由于 Chunkserver 可能会因为故障而停止运行，在此期间对块的变更操作（如写入）会使这些副本变得过时。因此，GFS 采用块版本号来区分最新和过时的副本。<br>
+过时副本检测的具体机制：</p>
+<pre tabindex="0"><code>版本号维护：
+每个块都有一个版本号，由 Master 维护。当 Master 授予某个块的新租约时，它会增加该块的版本号，并将新的版本号通知到最新的副本。Master 和这些副本会将新版本号记录在它们的持久化状态中。这些操作发生在客户端写入数据之前，确保客户端始终写入最新的块。
+检测过时副本：
+如果某个 Chunkserver 在块的变更操作期间不可用，那么该 Chunkserver 的块版本号不会更新。当 Chunkserver 重新启动并向 Master 报告它持有的块和版本号时，Master 会检测到这些块副本的版本号是否过时。如果 Chunkserver 报告的版本号低于 Master 记录的版本号，则该副本被视为过时。相反，如果 Chunkserver 报告的版本号高于 Master 的记录，Master 假定之前授予租约时发生了失败，并将更高的版本号视为最新版本。
+移除过时副本：
+Master 会在常规的垃圾回收过程中移除这些过时的副本。在此之前，当客户端请求块信息时，Master 会忽略这些过时的副本。此外，当客户端被通知某个块的租约持有者或 Chunkserver 被指示从另一个 Chunkserver 读取块时，Master 会包括块的版本号。客户端或 Chunkserver 会在执行操作时验证版本号，以确保它们始终访问最新的数据。
+</code></pre><h1 id="5-高可用与问题诊断">5. 高可用与问题诊断</h1>
+<p>在 GFS 的设计中，容错性 和 诊断能力 是应对频繁组件故障的关键挑战。</p>
+<h2 id="51-高可用性策略">5.1 高可用性策略</h2>
+<p>快速恢复：<br>
+无论是 Master 还是 Chunkserver，都设计成能在几秒钟内恢复状态并重启。服务器可能会因故障或正常操作被杀死进程，但客户端和其他服务器只会短暂遇到请求超时，然后重新连接到重启后的服务器并重试操作。<br>
+块副本：<br>
+每个块都有多个副本（默认是 3 个），并分布在不同的机架上。这样即使有 Chunkserver 下线或副本损坏，系统也能通过现有的副本保持可用性。Master 通过检查校验和来检测副本的损坏，并在必要时克隆副本以保持所需的副本数量。<br>
+Master 副本：<br>
+Master 的状态和操作日志会被复制到多台机器上。每当有状态变更时，只有在日志被写入到本地磁盘和所有副本机器的磁盘后，才算完成提交。如果 Master 发生故障，监控系统会在其他机器上启动新的 Master 进程，并使用操作日志进行恢复。此外，&ldquo;影子 Master&rdquo; 提供只读访问，即使主 Master 不可用，系统仍然可以处理读操作。</p>
+<h2 id="52-问题诊断">5.2 问题诊断</h2>
+<p>影子 Master：<br>
+影子 Master 提供了对文件系统的只读访问，即使主 Master 停机也不影响读取操作。影子 Master 稍微滞后于主 Master，通常仅有几毫秒的延迟。文件内容通过 Chunkserver 读取，因此应用程序不会遇到过时的文件内容，可能过时的只是文件元数据（如目录内容或访问控制信息）。<br>
+操作日志：<br>
+影子 Master 通过读取操作日志副本，并与主 Master 一样应用相同的变更序列，以保持其数据结构的更新。它依赖主 Master 来获取副本的位置信息更新（如创建和删除副本时的决策）。</p>
+<h2 id="53-数据完整性">5.3 数据完整性</h2>
+<p>在 GFS 中，数据完整性 是通过 校验和（checksumming） 机制来检测数据损坏的，尤其是在集群规模很大且磁盘故障频繁的情况下。这种方法帮助 GFS 识别并修复由于读写路径中的磁盘损坏而导致的数据损坏。</p>
+<h3 id="531-主要机制">5.3.1 主要机制</h3>
+<p>校验和的使用：</p>
+<pre tabindex="0"><code>每个块（chunk）会被分成 64 KB 的小块（block），每个小块对应一个 32 位的校验和。这些校验和被单独存储，和用户数据分开保存。
+在读取数据时，Chunkserver 会在返回数据之前先验证这些小块的校验和。如果校验和不匹配，Chunkserver 会向请求者返回错误，并向 Master 报告数据损坏。
+请求者可以从其他副本读取数据，而 Master 会根据报告情况复制一个新的有效副本，随后删除已损坏的副本。
+</code></pre><p>读操作中的校验和验证：</p>
+<pre tabindex="0"><code>读取操作时，Chunkserver 会先验证重叠读取范围内的数据块的校验和，确保不会传播已损坏的数据。如果校验和不匹配，Chunkserver 会报错，并启动修复过程。
+</code></pre><p>写操作中的校验和更新：</p>
+<pre tabindex="0"><code>对于追加操作（append），GFS 会增量更新最后一个部分填充的校验和块，并为新增的块计算校验和。
+对于覆盖写入（overwrite），GFS 必须在写入之前先验证要覆盖的块的起始和结束部分，以避免隐藏之前已存在的数据损坏。
+</code></pre><p>空闲时校验：</p>
+<pre tabindex="0"><code>在空闲时，Chunkserver 会扫描并验证不活跃的块，以检测可能存在的损坏。这确保了即使是很少读取的块，也不会因未检测的损坏影响数据的一致性。
+</code></pre>
+    </div>
+    <a href="/posts/google-file-system/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/googletest-%E6%AF%94%E8%BE%83%E5%99%A8/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-比较器">1. 比较器</h1>
+<p>本文介绍对于kdb中比较器<a href="https://github.com/2549141519/kdb/src/db/comp.cpp"><code>Comparator</code></a>的单元测试。</p>
+<p>比较器实现逻辑如下：</p>
+<pre tabindex="0"><code>解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。
+
+提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。
+
+比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。
+
+如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。
+
+结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。
+</code></pre><h1 id="2-googletest实现">2. GoogleTest实现</h1>
+<p>为测试比较器，实现了<a href="https://github.com/2549141519/kdb/src/db/test/comptest.cpp"><code>ComparatorTest</code></a>。</p>
+<p>为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。</p>
+<pre tabindex="0"><code>std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) {
+  auto key_size = VarintLength(set_context-&gt;key.size());
+  auto value_size = VarintLength(set_context-&gt;value.size());
+  auto sequence_number = VarintLength(set_context-&gt;value.size());
+
+  std::string simple_set_str = fmt::format(
+      &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key,
+      format64_vec[sequence_number], kEmpty1Space,
+      format32_vec[value_size], set_context-&gt;value);
+
+  char* start_ptr = simple_set_str.data();
+  start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size());
+
+  start_ptr += set_context-&gt;key.size();
+  start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number);
+
+  EncodeFixed8(start_ptr,ValueType::kTypeValue);
+
+  start_ptr += 1;
+  EncodeVarint32(start_ptr, set_context-&gt;value.size());
+
+  return simple_set_str;
+}
+</code></pre><p>实现了三个测试用例：</p>
+<ol>
+<li>测试两个相同的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareEqualStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;key&#34;));
+    context1.number = 1;
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key&#34;));
+    context2.number = 2;
+
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2));  // session1 &lt; session2，
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); // session2 &gt; session1，
+}
+</code></pre><p>在键值相同时，比较序列号大小。</p>
+<ol start="2">
+<li>测试两个不同的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareDifferentStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;key1&#34;));
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key2&#34;));
+    
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2)); 
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); 
+}
+</code></pre><ol start="3">
+<li>测试空的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareEmptyStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;&#34;));
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key&#34;));
+
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2)); 
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); 
+}
+</code></pre><p>测试命令：<br>
+<code>g++ -std=c++17 -I /usr/local/include -I /path/to/fmt/include -L /usr/local/lib comptest.cpp ../comp.cpp ../../utils/coding.cpp -o comptest -lgtest -lgtest_main -pthread -lfmt</code><br>
+执行命令后生成comptest文件，执行./comptest即可。</p>
+<p>测试结果如下：<br>
+<img src="../blogImg/gtest1.PNG" alt="Alt text"></p>
+
+    </div>
+    <a href="/posts/googletest-%E6%AF%94%E8%BE%83%E5%99%A8/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/kdb-%E5%86%85%E5%AD%98%E6%B1%A0/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-代码实现">1. 代码实现</h1>
+<p>kdb的内存池由<a href="https://github.com/2549141519/kdb/blob/main/src/utils/arena.h">arena.h</a>和<a href="https://github.com/2549141519/kdb/blob/main/src/utils/arena.cpp">arena.cpp</a>实现。</p>
+<p>实现内存池能够有效减少内存分配和释放的开销，提高系统性能。内存池的基本思想是预先分配一块大内存，并根据需要从中分配小块给应用程序使用，而不是每次都通过系统调用去动态分配和释放内存。</p>
+<p>代码实现了一个用于高效内存分配的类<code>Arena</code>，通过预分配一块较大的内存块，并在其上进行内存分配。</p>
+<h1 id="2-代码解析">2. 代码解析</h1>
+<h2 id="21-类的基本构造">2.1 类的基本构造</h2>
+<p><code>blocks_</code>: 保存所有分配的内存块，每一个内存块的大小由 <code>kBlockSize</code> 决定。所有分配的内存块的指针存储在一个 <code>std::vector&lt;char*&gt;</code> 中。</p>
+<p><code>alloc_ptr_</code>: 当前分配指针，指向内存池中下一个可用的内存位置。</p>
+<p><code>alloc_bytes_remaining_</code>: 当前块剩余的内存大小，用来记录当前内存块中还可以分配的字节数。</p>
+<p><code>memory_usage_</code>: 用 <code>std::atomic&lt;std::size_t&gt;</code> 类型记录总的内存使用量，适合多线程环境。</p>
+<h2 id="22-构造和析构">2.2 构造和析构</h2>
+<p>构造函数初始化了 <code>alloc_ptr_</code>（当前指针）为 <code>nullptr</code>，并将剩余内存字节数设为 0，表示当前没有可以分配的内存块。</p>
+<p>析构函数通过遍历 <code>blocks_</code>，逐一释放已分配的内存块，避免内存泄漏。</p>
+<h2 id="23-内存分配">2.3 内存分配</h2>
+<p><code>Allocate</code>: 这是对外暴露的内存分配接口。如果当前内存块中剩余的空间足够满足需求，则直接分配，否则调用 <code>AllocateFallback</code>，即分配新的内存块。</p>
+<p><code>AllocateFallback</code>: <a href="#26-allocatefallback%E4%B8%AD%E7%9A%84%E5%9D%97%E5%A4%A7%E5%B0%8F%E7%AD%96%E7%95%A5">AllocateFallback</a>在当前块的剩余内存不足时调用。首先检查所需的字节数是否超过 <code>kBlockSize / 4</code>（即 1024 字节）。如果超出，则直接为其分配一个新的块，大小为所需字节数；否则，分配一个常规的块，大小为 <code>kBlockSize</code>（4096 字节），并从其中分配所需的内存。</p>
+<p><code>AllocateNewBlock</code>: 该函数用于分配一个新的内存块。分配完新块后，存储块指针，并更新总的内存使用量。注意这里内存使用量增加的值是新块大小加上存储块指针的大小。</p>
+<h2 id="24-内存对齐">2.4 内存对齐</h2>
+<p><code>AllocateAligned</code></p>
+<h2 id="25-多线程支持">2.5 多线程支持</h2>
+<p><code>memory_usage_ </code>使用了 <code>std::atomic</code> 来保证在多线程环境下的安全访问。这意味着多个线程可以同时分配内存。</p>
+<p>但在实现时，默认假设了<code>Arena</code>主要用于单线程环境，因此其他部分（如<code>alloc_ptr_ </code>和<code>alloc_bytes_remaining_ </code>）没有使用锁机制。</p>
+<h2 id="26-allocatefallback中的块大小策略">2.6 AllocateFallback中的块大小策略</h2>
+<pre tabindex="0"><code>char *Arena::AllocateFallback(std::size_t bytes)
+    {
+        if (bytes &gt; kBlockSize / 4) 
+        {
+            char* result = AllocateNewBlock(bytes);
+            return result;
+        }
+        alloc_ptr_ = AllocateNewBlock(kBlockSize);
+        alloc_bytes_remaining_ = kBlockSize;
+
+        char* result = alloc_ptr_;
+        alloc_ptr_ += bytes;
+        alloc_bytes_remaining_ -= bytes;
+        return result;
+    }
+</code></pre><h3 id="261-内存块小于或等于-kblocksize--4-的情况">2.6.1 内存块小于或等于 <code>kBlockSize / 4 </code>的情况</h3>
+<p>对于小于等于 1024 字节的分配请求，<code>Arena </code>会预先分配一个较大的内存块（大小为 4096 字节），并将多次分配集中在同一块内存中。</p>
+<p>这种策略的优点是可以有效减少频繁调用<code>malloc</code>或<code>new</code>等系统内存分配函数的开销，因为系统级别的内存分配操作相对较慢。
+每个块都是 4096 字节，确保了即使是多个小内存块的分配，也可以有效利用这块内存。</p>
+<p>避免内存碎片:<br>
+小块的内存分配会从当前块中继续分配，直到该块的剩余空间不足。这种策略减少了内存碎片，并且较好地利用了已经分配的内存。</p>
+<p>缓存友好性:<br>
+通过在同一块大内存中分配多个小块，可以提高数据在 CPU 缓存中的局部性，有助于提高内存访问性能。</p>
+<h3 id="262-内存块大于-kblocksize--4-的情况">2.6.2 内存块大于 <code>kBlockSize / 4</code> 的情况</h3>
+<p>当请求的内存大于 1024 字节时，<code>Arena</code> 会直接为这个请求分配一块大小等于 <code>bytes</code> 的内存，而不是从一个 4096 字节的块中分配。这意味着大块的内存请求会得到独立的一整块内存。</p>
+<p>这种策略的优点在于避免了较大内存块分配后，导致 4096 字节内存块中剩余的空间无法有效利用的情况。假如请求 3000 字节，如果仍然从 4096 字节的块中分配，剩下的 1096 字节可能很难再用来满足其他请求，造成浪费。</p>
+<p>通过为较大请求分配独立的内存块，可以确保内存的分配效率。</p>
+<p>减少大内存请求对整体内存池的影响:<br>
+当大于 1024 字节的请求需要独立的内存块时，它不会影响到已经存在的小块分配，也不会浪费内存池中较大的块。这样可以将小内存分配和大内存分配的需求分开处理，避免相互干扰。</p>
+
+    </div>
+    <a href="/posts/kdb-%E5%86%85%E5%AD%98%E6%B1%A0/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/kdb-%E8%B7%B3%E8%A1%A8/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-跳表的定义">1. 跳表的定义</h1>
+<p>跳表（SkipList）是一种用于维护有序元素的链表结构，通过在链表基础上增加多层索引，实现快速查找和插入操作。跳表的层数是随机生成的，最上层节点较少，底层节点最多。<br>
+每个节点拥有多个指向下一个节点的指针，不同的层级允许快速跳过多个节点。<br>
+通过多层索引，跳表的查找和插入复杂度可以达到 O(logn)，接近二分查找的性能。<br>
+kdb的跳表在<a href="https://github.com/2549141519/kdb/blob/main/src/include/skiplist.h">skiplist.h</a>中实现。</p>
+<h2 id="12-模板类定义">1.2 模板类定义</h2>
+<pre tabindex="0"><code>template&lt;typename Key, class Comparator&gt;
+class SkipList {
+</code></pre><p><code>Key</code>:跳表存储的键类型，可以是任何类型。<br>
+<code>Comparator</code>:比较器，用于比较<code>Key</code>类型的值。跳表是有序的，因此需要一个比较器来确定键的顺序。</p>
+<h2 id="13-内部节点结构node">1.3 内部节点结构<code>Node</code></h2>
+<pre tabindex="0"><code>struct Node {
+  Key const key;
+  std::atomic&lt;Node*&gt; next_[1];  
+};
+</code></pre><p>每个节点存储一个键值 <code>key</code> 和一个 <code>next_</code> 指针数组，<code>next_ </code>的大小根据节点的高度动态分配。每个指针指向跳表中不同层的下一个节点，跳表的结构通过这些指针数组实现多层索引。<br>
+使用<code>atomic</code>类型确保无锁操作的线程安全性。</p>
+<h1 id="2-重要操作">2. 重要操作</h1>
+<h2 id="21-插入操作insert">2.1 插入操作<code>Insert</code></h2>
+<pre tabindex="0"><code>void SkipList&lt;Key, Comparator&gt;::Insert(const Key&amp; key) {
+    Node* prev[KMaxHeight];
+    Node* n = FindGreaterOrEqual(key, prev);  // 找到插入位置   
+    assert(n == nullptr || !Equal(key, n-&gt;key));  // 跳表中不允许有重复键
+    int height = RandomHeight();  // 随机生成节点的高度
+    if (height &gt; GetMaxHeight()) {
+        for (int i = GetMaxHeight(); i &lt; height; i++) {
+            prev[i] = head_;
+        }
+        max_height_.store(height, std::memory_order_relaxed);
+    }
+    n = NewNode(key, height);  // 创建新节点
+    for (int i = 0; i &lt; height; i++) {
+        n-&gt;NoBarrier_SetNext(i, prev[i]-&gt;NoBarrier_Next(i));  // 连接新节点
+        prev[i]-&gt;SetNext(i, n);  // 设置前一个节点的下一指针
+    }
+}
+</code></pre><p>查找插入位置：<br>
+调用 <a href="#22-%E6%9F%A5%E6%89%BE%E6%93%8D%E4%BD%9Cfindgreaterorequal"><code>FindGreaterOrEqual</code></a> 方法，找到跳表中第一个大于等于 <code>key</code> 的位置。<code>prev</code> 数组存储每一层插入位置前的节点。</p>
+<p>随机生成高度：<br>
+通过 <a href="#23-%E9%9A%8F%E6%9C%BA%E9%AB%98%E5%BA%A6%E7%94%9F%E6%88%90randomheight"><code>RandomHeight</code></a> 随机生成节点的高度，这决定了新节点在跳表中有多少层索引。</p>
+<p>调整高度：<br>
+如果新节点的高度超过当前最大高度，更新跳表的最大高度，并将新节点插入到相应的高度。</p>
+<p>连接节点：<br>
+通过 <code>NoBarrier_SetNext</code> 和 <code>SetNext</code>，将新节点插入到跳表的每一层。</p>
+<h2 id="22-查找操作findgreaterorequal">2.2 查找操作<code>FindGreaterOrEqual</code></h2>
+<pre tabindex="0"><code>Node* SkipList&lt;Key, Comparator&gt;::FindGreaterOrEqual(const Key&amp; key, Node** prev) const {
+    Node* n = head_;    
+    int level = GetMaxHeight() - 1;
+    while (true) {
+        Node* next = n-&gt;Next(level);  // 获取当前层下一个节点
+        if (KeyIsAfterNode(key, next)) {  // 如果下一个节点小于 key，继续往后找
+            n = next;
+        } else {
+            if (prev != nullptr) prev[level] = n;  // 记录当前节点
+            if (level == 0) return next;  // 找到第一个大于等于 key 的节点
+            else level--;
+        }
+    }
+}
+</code></pre><p>逐层查找：<br>
+从最高层开始，逐层向下查找，直到找到第一个大于等于 <code>key</code> 的节点。<br>
+优化查找：<br>
+通过多层索引，可以快速跳过大量节点，减少查找时间。<br>
+记录前一个节点：<br>
+如果需要插入新节点，<code>prev</code> 数组会记录每层中当前节点的前驱节点。</p>
+<h2 id="23-随机高度生成randomheight">2.3 随机高度生成<code>RandomHeight</code></h2>
+<pre tabindex="0"><code>int SkipList&lt;Key, Comparator&gt;::RandomHeight() {
+    static const unsigned int kBranching = 4;
+    int height = 1;
+    while (height &lt; KMaxHeight &amp;&amp; rnd_.OneIn(kBranching)) {
+        height++;
+    }
+    return height;
+}
+</code></pre><p>随机生成高度：通过概率<code>1/kBranching</code>来增加节点的高度。高度越高，节点越少，索引效率越高。<br>
+最大高度限制：确保高度不超过 <code>KMaxHeight</code>（12层）。</p>
+<h1 id="3-线程安全性">3. 线程安全性</h1>
+<h2 id="31-无锁结构">3.1 无锁结构</h2>
+<p><code>std::atomic&lt;Node*&gt; next_[1];</code><br>
+<code>std::atomic</code> 提供了一种可以在线程之间原子性地读写数据的机制，不需要锁。<code>next_</code> 是一个原子类型的指针数组，存储的是指向其他节点的指针。<code>std::atomic&lt;Node*&gt;</code> 确保在多个线程访问或修改 <code>next_</code> 指针时，能够避免竞争条件。</p>
+<h2 id="32-内存序的使用">3.2 内存序的使用</h2>
+<h3 id="321-memory_order_acquire">3.2.1 <code>memory_order_acquire</code></h3>
+<p><code>memory_order_acquire </code>用于保证对变量的读取操作不会在该读取之前的操作之后发生。即，任何读取操作都不会被重排序到 <code>memory_order_acquire </code>之前。</p>
+<pre tabindex="0"><code>Node* Next(int n) {
+    assert(n &gt;= 0);
+    return next_[n].load(std::memory_order_acquire);
+}
+</code></pre><p><code>load(std::memory_order_acquire)</code>：在读取 <code>next_</code> 指针时，确保在 <code>next_</code> 被读取之后的操作不会被编译器或 CPU 重排序到读取操作之前。这意味着读取到的指针值是最新的，之前的所有写入操作已经对其他线程可见。</p>
+<h3 id="322-memory_order_release">3.2.2 <code>memory_order_release</code></h3>
+<p><code>memory_order_release </code>用于保证对变量的写入操作不会在该写入之后的操作之前发生。即，任何写入操作都不会被重排序到 <code>memory_order_release </code>之后。</p>
+<pre tabindex="0"><code>void SetNext(int n, Node *x) {
+    assert(n &gt;= 0);
+    next_[n].store(x, std::memory_order_release);
+}
+</code></pre><p><code>store(std::memory_order_release)</code>：在设置 <code>next_</code> 指针时，确保在写入新值之前的操作已经全部完成，并且对其他线程可见。这意味着在 <code>SetNext</code> 之前的任何内存操作都不会被重排序到这个存储操作之后。</p>
+<h3 id="323-memory_order_relaxed">3.2.3 <code>memory_order_relaxed</code></h3>
+<p><code>memory_order_relaxed </code>是一种较弱的内存序，既不需要保证读取或写入的顺序，也不需要对其他线程可见。它仅确保操作本身是原子的，而不关心操作的顺序。</p>
+<pre tabindex="0"><code>Node* NoBarrier_Next(int n) {
+    assert(n &gt;= 0);
+    return next_[n].load(std::memory_order_relaxed);
+}
+
+void NoBarrier_SetNext(int n, Node* x) {
+    assert(n &gt;= 0);
+    next_[n].store(x, std::memory_order_relaxed);
+}
+</code></pre><p><code>memory_order_relaxed</code> 用于无需严格保证顺序的情况下，例如跳表中的某些内部操作。这些操作不会影响系统的全局状态，因此不需要严格的内存顺序保证。相较于 <code>acquire</code> 和 <code>release</code>，这种内存序可以进一步提高性能。</p>
+<h1 id="4-无锁跳表实现细节">4. 无锁跳表实现细节</h1>
+<h2 id="41-查找操作-findgreaterorequal-的无锁实现">4.1 查找操作 (<code>FindGreaterOrEqual</code>) 的无锁实现</h2>
+<p>在跳表中查找某个键时，不需要修改任何节点的结构，只需要读取节点的信息。因此，在查找操作<a href="#22-%E6%9F%A5%E6%89%BE%E6%93%8D%E4%BD%9Cfindgreaterorequal"><code>FindGreaterOrEqual</code></a>中使用了 <code>memory_order_acquire</code> 来读取节点指针。<br>
+<code>Next(level) </code>使用 <code>memory_order_acquire</code> 确保读取到的节点指针是最新的，并且没有被其他线程重排序。</p>
+<h2 id="42-插入操作-insert-的无锁实现">4.2 插入操作 (<code>Insert</code>) 的无锁实现</h2>
+<p>插入操作<a href="#21-%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9Cinsert"><code>Insert</code></a>需要在多个层中更新节点指针，因此这里使用了 <code>memory_order_release</code> 来确保插入操作的顺序。<br>
+<code>NoBarrier_SetNext</code> 使用 <code>memory_order_relaxed</code>，因为在构建新节点时不需要对指针设置严格的内存序。但在插入节点时，需要使用 <code>SetNext(i, n) </code>来确保在其他线程读取新节点时，插入顺序是正确的（通过 <code>memory_order_release</code> 保证）。</p>
+<h1 id="5-迭代器">5. 迭代器</h1>
+<p>跳表中提供了一个内部迭代器 <code>Iterator</code>，允许像标准库中的迭代器一样遍历跳表。</p>
+<pre tabindex="0"><code>class Iterator {
+public:
+    explicit Iterator(const SkipList* list);
+
+    bool Valid() const;
+    const Key&amp; key() const;
+    void Next();
+    void Prev();
+    void SeekToFirst();
+    void SeekToLast();
+    void Seek(const Key&amp; target);
+};
+</code></pre><p><code>SeekToFirst</code>：将迭代器指向跳表的第一个节点。<br>
+<code>SeekToLast</code>：将迭代器指向跳表的最后一个节点。<br>
+<code>Seek</code>：将迭代器指向大于等于指定 key 的第一个节点。</p>
+
+    </div>
+    <a href="/posts/kdb-%E8%B7%B3%E8%A1%A8/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+    </section>
+    <ul class="pagination pagination-default">
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="First" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Previous" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/2/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul></article>
 
     </main>
     <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Wei Haoyu</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. 使用miniob的DEBUG
+miniob已经实现了launch.json和tasks.json，可以直接调试。
+在miniob/src/observer/net/sql_task_handler.cpp中，直接找到handle_sql函数，打断点，调试即可。
+
+
+RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event)
+{
+  RC rc = query_cache_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = parse_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = resolve_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = optimize_stage_.handle_request(sql_event);
+  if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) {
+    LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = execute_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  return rc;
+}
+2. 调试
+打断点：
+
+开始调试：
+键入CREATE TABLE TEST (ID int),创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 
+
+解析阶段：
+
+解析完成后，生成语法树SQLNode：
+
+CREATE TABLE操作没有优化计划，返回UNIMPLEMENTED，直接进入执行阶段。
+
+进入执行器执行，输出SUCCESS。
+
+编译结束后执行SHOW TABLES命令查看所有表，确保成功创建表：
+">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/miniob-debug-sql%E8%AF%AD%E5%8F%A5/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/miniob-debug-sql%E8%AF%AD%E5%8F%A5/">
+  <meta property="og:site_name" content="Wei Haoyu">
+  <meta property="og:title" content="Wei Haoyu">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 使用miniob的DEBUG miniob已经实现了launch.json和tasks.json，可以直接调试。
+在miniob/src/observer/net/sql_task_handler.cpp中，直接找到handle_sql函数，打断点，调试即可。
+RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event) { RC rc = query_cache_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc)); return rc; } rc = parse_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc)); return rc; } rc = resolve_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc)); return rc; } rc = optimize_stage_.handle_request(sql_event); if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) { LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc)); return rc; } rc = execute_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc)); return rc; } return rc; } 2. 调试 打断点：
+开始调试：
+键入CREATE TABLE TEST (ID int),创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 解析阶段：
+解析完成后，生成语法树SQLNode：
+CREATE TABLE操作没有优化计划，返回UNIMPLEMENTED，直接进入执行阶段。
+进入执行器执行，输出SUCCESS。
+编译结束后执行SHOW TABLES命令查看所有表，确保成功创建表：">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Wei Haoyu">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 使用miniob的DEBUG miniob已经实现了launch.json和tasks.json，可以直接调试。
+在miniob/src/observer/net/sql_task_handler.cpp中，直接找到handle_sql函数，打断点，调试即可。
+RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event) { RC rc = query_cache_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc)); return rc; } rc = parse_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc)); return rc; } rc = resolve_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc)); return rc; } rc = optimize_stage_.handle_request(sql_event); if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) { LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc)); return rc; } rc = execute_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc)); return rc; } return rc; } 2. 调试 打断点：
+开始调试：
+键入CREATE TABLE TEST (ID int),创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 解析阶段：
+解析完成后，生成语法树SQLNode：
+CREATE TABLE操作没有优化计划，返回UNIMPLEMENTED，直接进入执行阶段。
+进入执行器执行，输出SUCCESS。
+编译结束后执行SHOW TABLES命令查看所有表，确保成功创建表：">
+  <meta itemprop="wordCount" content="113">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Wei Haoyu">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 使用miniob的DEBUG miniob已经实现了launch.json和tasks.json，可以直接调试。
+在miniob/src/observer/net/sql_task_handler.cpp中，直接找到handle_sql函数，打断点，调试即可。
+RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event) { RC rc = query_cache_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc)); return rc; } rc = parse_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc)); return rc; } rc = resolve_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc)); return rc; } rc = optimize_stage_.handle_request(sql_event); if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) { LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc)); return rc; } rc = execute_stage_.handle_request(sql_event); if (OB_FAIL(rc)) { LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc)); return rc; } return rc; } 2. 调试 打断点：
+开始调试：
+键入CREATE TABLE TEST (ID int),创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 解析阶段：
+解析完成后，生成语法树SQLNode：
+CREATE TABLE操作没有优化计划，返回UNIMPLEMENTED，直接进入执行阶段。
+进入执行器执行，输出SUCCESS。
+编译结束后执行SHOW TABLES命令查看所有表，确保成功创建表：">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Wei Haoyu
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-使用miniob的debug">1. 使用miniob的DEBUG</h1>
+<p>miniob已经实现了<code>launch.json</code>和<code>tasks.json</code>，可以直接调试。<br>
+在<code>miniob/src/observer/net/sql_task_handler.cpp</code>中，直接找到<code>handle_sql</code>函数，打断点，调试即可。<br>
+<img src="../blogImg/debug2.PNG" alt="图片2"><br>
+<img src="../blogImg/debug3.PNG" alt="图片3"></p>
+<pre tabindex="0"><code>RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event)
+{
+  RC rc = query_cache_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = parse_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = resolve_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = optimize_stage_.handle_request(sql_event);
+  if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) {
+    LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = execute_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  return rc;
+}
+</code></pre><h1 id="2-调试">2. 调试</h1>
+<p>打断点：<br>
+<img src="../blogImg/debug1.PNG" alt="图1"><br>
+开始调试：<br>
+键入<code>CREATE TABLE TEST (ID int)</code>,创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 <br>
+<img src="../blogImg/debug4.PNG" alt="图4"><br>
+解析阶段：<br>
+<img src="../blogImg/debug5.PNG" alt="图5"><br>
+解析完成后，生成语法树SQLNode：<br>
+<img src="../blogImg/debug6.PNG" alt="图6"><br>
+<code>CREATE TABLE</code>操作没有优化计划，返回<code>UNIMPLEMENTED</code>，直接进入执行阶段。<br>
+<img src="../blogImg/debug7.PNG" alt="图7"><br>
+进入执行器执行，输出SUCCESS。<br>
+<img src="../blogImg/debug8.PNG" alt="图8"><br>
+编译结束后执行<code>SHOW TABLES</code>命令查看所有表，确保成功创建表：<br>
+<img src="../blogImg/debug9.PNG" alt="图9"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Wei Haoyu 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

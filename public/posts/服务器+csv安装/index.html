@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Wei Haoyu</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+Ubuntu装服务器
+下载
+去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)
+安装
+
+使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文
+
+键盘布局选择默认
+
+手动填入IP地址
+
+代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码
+
+
+网络配置
+装好之后 配置网络
+$ sudo vi /etc/netplan/00-installer-config.yaml
+// 编辑如下，把其他网卡删掉了
+// 配置信息需要根据实际情况修改
+# This is the network config written by &#39;subiquity&#39;
+network:
+  ethernets:
+    eno3:
+      dhcp4: no
+      dhcp6: no
+      addresses: [your.ip/24]
+      gateway4: your.gateway
+      nameservers:
+        addresses: [your.dns1, your.dns2]
+配置生效 sudo netplan apply
+替换镜像源 能apt-install
+sudo cp /etc/apt/source.list /etc/apt/source.list.origin
+sudo vi /etc/apt/source.list
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+安装梯子
+这个我就不写了 有需要可由我来装">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/%E6%9C%8D%E5%8A%A1%E5%99%A8&#43;csv%E5%AE%89%E8%A3%85/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/%E6%9C%8D%E5%8A%A1%E5%99%A8&#43;csv%E5%AE%89%E8%A3%85/">
+  <meta property="og:site_name" content="Wei Haoyu">
+  <meta property="og:title" content="Wei Haoyu">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} Ubuntu装服务器 下载 去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)
+安装 使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文 键盘布局选择默认 手动填入IP地址 代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码 网络配置 装好之后 配置网络
+$ sudo vi /etc/netplan/00-installer-config.yaml // 编辑如下，把其他网卡删掉了 // 配置信息需要根据实际情况修改 # This is the network config written by &#39;subiquity&#39; network: ethernets: eno3: dhcp4: no dhcp6: no addresses: [your.ip/24] gateway4: your.gateway nameservers: addresses: [your.dns1, your.dns2] 配置生效 sudo netplan apply
+替换镜像源 能apt-install sudo cp /etc/apt/source.list /etc/apt/source.list.origin sudo vi /etc/apt/source.list deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse 安装梯子 这个我就不写了 有需要可由我来装">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Wei Haoyu">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} Ubuntu装服务器 下载 去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)
+安装 使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文 键盘布局选择默认 手动填入IP地址 代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码 网络配置 装好之后 配置网络
+$ sudo vi /etc/netplan/00-installer-config.yaml // 编辑如下，把其他网卡删掉了 // 配置信息需要根据实际情况修改 # This is the network config written by &#39;subiquity&#39; network: ethernets: eno3: dhcp4: no dhcp6: no addresses: [your.ip/24] gateway4: your.gateway nameservers: addresses: [your.dns1, your.dns2] 配置生效 sudo netplan apply
+替换镜像源 能apt-install sudo cp /etc/apt/source.list /etc/apt/source.list.origin sudo vi /etc/apt/source.list deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse 安装梯子 这个我就不写了 有需要可由我来装">
+  <meta itemprop="wordCount" content="344">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Wei Haoyu">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} Ubuntu装服务器 下载 去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)
+安装 使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文 键盘布局选择默认 手动填入IP地址 代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码 网络配置 装好之后 配置网络
+$ sudo vi /etc/netplan/00-installer-config.yaml // 编辑如下，把其他网卡删掉了 // 配置信息需要根据实际情况修改 # This is the network config written by &#39;subiquity&#39; network: ethernets: eno3: dhcp4: no dhcp6: no addresses: [your.ip/24] gateway4: your.gateway nameservers: addresses: [your.dns1, your.dns2] 配置生效 sudo netplan apply
+替换镜像源 能apt-install sudo cp /etc/apt/source.list /etc/apt/source.list.origin sudo vi /etc/apt/source.list deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse 安装梯子 这个我就不写了 有需要可由我来装">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Wei Haoyu
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="ubuntu装服务器">Ubuntu装服务器</h1>
+<h3 id="下载">下载</h3>
+<p>去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)</p>
+<h3 id="安装">安装</h3>
+<ol>
+<li>使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv1.png" alt="![Alt text](image.png)"></li>
+<li>键盘布局选择默认
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv2.png" alt="![Alt text](image.png)"></li>
+<li>手动填入IP地址
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv3.png" alt="![Alt text](image.png)"></li>
+<li>代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv4.png" alt="![Alt text](image.png)"></li>
+</ol>
+<h3 id="网络配置">网络配置</h3>
+<p>装好之后 配置网络</p>
+<pre tabindex="0"><code>$ sudo vi /etc/netplan/00-installer-config.yaml
+// 编辑如下，把其他网卡删掉了
+// 配置信息需要根据实际情况修改
+# This is the network config written by &#39;subiquity&#39;
+network:
+  ethernets:
+    eno3:
+      dhcp4: no
+      dhcp6: no
+      addresses: [your.ip/24]
+      gateway4: your.gateway
+      nameservers:
+        addresses: [your.dns1, your.dns2]
+</code></pre><p>配置生效 <code>sudo netplan apply</code></p>
+<h3 id="替换镜像源-能apt-install">替换镜像源 能apt-install</h3>
+<pre tabindex="0"><code>sudo cp /etc/apt/source.list /etc/apt/source.list.origin
+sudo vi /etc/apt/source.list
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+</code></pre><h3 id="安装梯子">安装梯子</h3>
+<p>这个我就不写了 有需要可由我来装</p>
+<h3 id="安装环境">安装环境</h3>
+<pre tabindex="0"><code>sudo apt-get update -y
+sudo apt-get install -y policycoreutils-python-utils
+sudo apt install policycoreutils selinux-utils selinux-basics
+sudo apt-get install -y semanage-utils
+</code></pre><p>装服务器应该默认装了ssh 现在就可以连接了
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv5.png" alt="![Alt text](image.png)"></p>
+<h1 id="csv安装">csv安装</h1>
+<h3 id="测试服务器">测试服务器</h3>
+<p>测试一下之前装的服务器成不成功</p>
+<pre tabindex="0"><code>$ sudo chmod a+w /opt
+$ cd /opt/
+$ git clone https://gitee.com/anolis/hygon-devkit.git
+$ mv hygon-devkit hygon
+$ sudo cp /opt/hygon/bin/hag /usr/bin
+</code></pre><h3 id="更换内核">更换内核</h3>
+<p>我们需要把虚拟机内核和服务器内核更换成适合csV架构的内核 先下载更换主机内核</p>
+<pre tabindex="0"><code>$ sudo chmod a+w /opt
+$ cd /opt/
+$ git clone https://gitee.com/anolis/hygon-devkit.git
+$ mv hygon-devkit hygon
+$ sudo cp /opt/hygon/bin/hag /usr/bin
+</code></pre><h3 id="导入证书">导入证书</h3>
+<pre tabindex="0"><code>sudo apt-get install -y ca-certificates
+# 如果已经根据 1-安装操作系统和内核部分安装了hygon-devkit，可以在以下目录找到hag
+$ ls -l /opt/hygon/bin/hag
+# 如果没有安装hygon-devkit，可以使用以下命令下载
+$ mkdir -p /opt/hygon/bin/
+$ cd /opt/hygon/bin/
+$ wget https://gitee.com/anolis/hygon-devkit/raw/master/bin/hag
+$ chmod +x hag
+
+$ cd /opt/hygon/bin
+$ sudo ./hag general get_id
+$ sudo ./hag general hgsc_version
+</code></pre><p>以下命令确认整数是否导入成功</p>
+<pre tabindex="0"><code>$ cd /opt/hygon/bin
+$ sudo ./hag csv platform_status
+</code></pre><p>可以看到是成功的
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv6.png" alt="![Alt text](image.png)"></p>
+<h3 id="安装软件">安装软件</h3>
+<ol>
+<li>安装依赖 <code>sudo /opt/hygon/csv/install_csv_sw.sh</code>
+后续还会缺依赖 不知道为啥 可能服务器新装的把 不过缺什么 apt-install即可</li>
+<li>安装qemu，用于启动虚拟机</li>
+</ol>
+<pre tabindex="0"><code>$ git clone https://gitee.com/anolis/hygon-qemu.git
+$ cd hygon-qemu/
+$ sudo /opt/hygon/csv/build_qemu.sh
+</code></pre><ol start="3">
+<li>安装grub</li>
+</ol>
+<pre tabindex="0"><code>$ wget https://ftp.gnu.org/gnu/grub/grub-2.06.tar.gz
+$ tar -xvf grub-2.06.tar.gz
+$ cd grub-2.06/
+$ sudo /opt/hygon/csv/build_grub.sh
+</code></pre><ol start="4">
+<li>安装edk2</li>
+</ol>
+<pre tabindex="0"><code>$ git clone https://gitee.com/anolis/hygon-edk2.git
+$ cd hygon-edk2/
+$ git submodule update --init
+$ sudo /opt/hygon/csv/build_edk2.sh
+</code></pre><ol start="5">
+<li>安装devit</li>
+</ol>
+<pre tabindex="0"><code>$ cd /opt/hygon/csv/
+$ sudo ./make_vm_img.sh
+$ git clone -b master https://github.com/guanzhi/GmSSL.git
+$ sudo ./build_devkit.sh
+</code></pre><ol start="6">
+<li>运行虚拟机</li>
+</ol>
+<pre tabindex="0"><code> sudo qemu-system-x86_64 -name csv-vm --enable-kvm -cpu host -m 6114 -hda /opt/hygon/csv/vm.qcow2 -drive if=pflash,format=raw,unit=0,file=/opt/hygon/csv/OVMF_CODE.fd,readonly=on -qmp tcp:127.0.0.1:2222,server,nowait -vnc 0.0.0.0:0 -object sev-guest,id=sev0,policy=0x1,cbitpos=47,reduced-phys-bits=5 -machine memory-encryption=sev0 -netdev bridge,br=virbr0,id=net0 -device virtio-net-pci,netdev=net0,romfile= -nographic
+</code></pre><p>这个命令需要改一下 我在虚拟机更新内核的时候磁盘空间不够了 这个虚拟机 他用的是用户模式 只能出不能进 所以需要用2222端口做ssh转发才能外部连接</p>
+<p>我成功配置好了
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv7.png" alt="![Alt text](image.png)"></p>
+<ol start="7">
+<li>内核复制到虚拟机</li>
+</ol>
+<pre tabindex="0"><code>root@ubuntu:~# scp ubuntu@10.10.11.115:/opt/hygon/kernel.tgz ./
+ubuntu@10.10.11.115&#39;s password: 
+kernel.tgz                                      100%  112   147.7KB/s   00:
+</code></pre><ol start="8">
+<li>发现磁盘无法分区的话 先kill虚拟机进程 然后变大qemu的磁盘空间大小</li>
+</ol>
+<pre tabindex="0"><code>sudo qemu-img resize /opt/hygon/csv/vm.qcow2 +20G
+</code></pre><ol start="9">
+<li>成功安装</li>
+</ol>
+<p><img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv8.png" alt="![Alt text](image.png)">
+对了 虚拟机镜像也要替换</p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Wei Haoyu 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

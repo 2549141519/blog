@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Wei Haoyu</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+    
+      <link href="/posts/index.xml" rel="alternate" type="application/rss+xml" title="Wei Haoyu" />
+      <link href="/posts/index.xml" rel="feed" type="application/rss+xml" title="Wei Haoyu" />
+      
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/">
+  <meta property="og:site_name" content="Wei Haoyu">
+  <meta property="og:title" content="Posts">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Posts">
+  <meta itemprop="datePublished" content="2025-07-27T21:06:51+08:00">
+  <meta itemprop="dateModified" content="2025-07-27T21:06:51+08:00">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Posts">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+
+  <header>
+    <div class="pb3-m pb6-l bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Wei Haoyu
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+      <div class="tc-l pv3 ph3 ph4-ns">
+        <h1 class="f2 f-subheadline-l fw2 light-silver mb0 lh-title">
+          Posts
+        </h1>
+        
+      </div>
+    </div>
+  </header>
+
+
+    <main class="pb7" role="main">
+      
+  <article class="pa3 pa4-ns nested-copy-line-height">
+    <section class="cf ph3 ph5-l pv3 pv4-l f4 tc-l center measure-wide lh-copy nested-links mid-gray"></section>
+    <section class="flex-ns mt5 flex-wrap justify-around">
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/mapreduce-for-nosql/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-前言">1. 前言</h1>
+<p>本文将实现MapReduce和NoSQL数据库的交互，统计单词出现次数。
+NoSQL数据库选用redis6.0，以下是redis操作的一些命令(我设置的redis6.0端口为6380)：</p>
+<blockquote>
+<p>sudo redis-server /etc/redis/redis.conf<br>
+//启动redis6.0实例<br>
+redis-cli -p 6380<br>
+//连接redis6.0实例,6380为端口号<br>
+redis-cli -p 6380 KEYS &ldquo;key*&rdquo; | xargs redis-cli -p 6380 DEL<br>
+//删除redis6.0实例中以key*为前缀的所有key</p></blockquote>
+<h1 id="2-使用go语言实现">2. 使用go语言实现</h1>
+<h2 id="21-生成随机数据并存入redis">2.1 生成随机数据并存入Redis</h2>
+<p>随机生成1万个单词，并写入redis数据库中：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;context&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;math/rand&rdquo;<br>
+&ldquo;time&rdquo;<br>
+&ldquo;github.com/go-redis/redis/v8&rdquo;<br>
+)<br>
+// 生成随机字符串<br>
+func randomString(n int) string {<br>
+letters := []rune(&ldquo;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&rdquo;)<br>
+s := make([]rune, n)<br>
+for i := range s {<br>
+s[i] = letters[rand.Intn(len(letters))]<br>
+}<br>
+return string(s)<br>
+}<br>
+// 生成随机数据并存入Redis<br>
+func generateDataAndSaveToRedis(rdb *redis.Client, count int) {<br>
+ctx := context.Background()<br>
+for i := 0; i &lt; count; i++ {<br>
+key := fmt.Sprintf(&ldquo;key%d&rdquo;, i)<br>
+value := randomString(3) // 生成长度为3的随机字符串<br>
+err := rdb.Set(ctx, key, value, 0).Err()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+}<br>
+fmt.Printf(&ldquo;Successfully generated and saved %d random data entries to Redis.\n&rdquo;, count)<br>
+}<br>
+func main() {<br>
+// 设置随机种子<br>
+rand.Seed(time.Now().UnixNano())<br>
+// 连接到Redis<br>
+rdb := redis.NewClient(&amp;redis.Options{<br>
+Addr: &ldquo;localhost:6380&rdquo;, // Redis服务器地址<br>
+DB:   0,                // 使用默认的DB<br>
+})<br>
+// 生成10000个随机数据并存入Redis<br>
+generateDataAndSaveToRedis(rdb, 10000)<br>
+}</p></blockquote>
+<p>执行命令：go run Generate_random_data.go<br>
+<img src="../blogImg/MapReduce1.PNG" alt="Alt text"></p>
+<h2 id="22-读取redis数据到文件">2.2 读取Redis数据到文件</h2>
+<p>读取Redis数据到文件：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;bufio&rdquo;<br>
+&ldquo;context&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;os&rdquo;<br>
+&ldquo;github.com/go-redis/redis/v8&rdquo;<br>
+)<br>
+// 从Redis中读取所有数据<br>
+func fetchDataFromRedis(rdb <em>redis.Client) map[string]string {<br>
+ctx := context.Background()<br>
+keys, err := rdb.Keys(ctx, &ldquo;</em>&rdquo;).Result()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+data := make(map[string]string)<br>
+for _, key := range keys {<br>
+value, err := rdb.Get(ctx, key).Result()<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+data[key] = value<br>
+}<br>
+return data<br>
+}<br>
+// 将数据写入到文件<br>
+func writeDataToFile(data map[string]string, filename string) {<br>
+file, err := os.Create(filename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+writer := bufio.NewWriter(file)<br>
+for key, value := range data {<br>
+fmt.Fprintf(writer, &ldquo;%s\t%s\n&rdquo;, key, value)<br>
+}<br>
+writer.Flush()<br>
+fmt.Printf(&ldquo;Data successfully written to %s\n&rdquo;, filename)<br>
+}<br>
+func main() {<br>
+// 连接到Redis<br>
+rdb := redis.NewClient(&amp;redis.Options{<br>
+Addr: &ldquo;localhost:6380&rdquo;, // Redis服务器地址<br>
+DB:   0,                // 使用默认的DB<br>
+})<br>
+// 从Redis中读取数据<br>
+data := fetchDataFromRedis(rdb)<br>
+// 将数据写入到文件作为MapReduce输入<br>
+writeDataToFile(data, &ldquo;input.txt&rdquo;)<br>
+}</p></blockquote>
+<p>执行命令：go run Read_data.go<br>
+<img src="../blogImg/MapReduce2.PNG" alt="Alt text"></p>
+<p>此时input.txt文件内容如下：<br>
+<img src="../blogImg/MapReduce3.PNG" alt="Alt text"></p>
+<h2 id="23-mapreduce实现">2.3 MapReduce实现</h2>
+<p>MapReduce实现：</p>
+<blockquote>
+<p>package main<br>
+import (<br>
+&ldquo;bufio&rdquo;<br>
+&ldquo;fmt&rdquo;<br>
+&ldquo;os&rdquo;<br>
+&ldquo;strings&rdquo;<br>
+)<br>
+// Map函数将读取输入文件，并输出每个单词的键值对（word, 1）<br>
+func mapFunction(filename string) map[string]int {<br>
+file, err := os.Open(filename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+wordCount := make(map[string]int)<br>
+scanner := bufio.NewScanner(file)<br>
+for scanner.Scan() {<br>
+line := scanner.Text()<br>
+// 假设输入文件每行的格式是 &ldquo;key\tvalue&rdquo;<br>
+parts := strings.Split(line, &ldquo;\t&rdquo;)<br>
+if len(parts) != 2 {<br>
+continue // 跳过格式不正确的行<br>
+}<br>
+value := parts[1]<br>
+words := strings.Fields(value)<br>
+for _, word := range words {<br>
+wordCount[word] += 1<br>
+}<br>
+}<br>
+if err := scanner.Err(); err != nil {<br>
+panic(err)<br>
+}<br>
+return wordCount<br>
+}<br>
+// Reduce函数将汇总Map函数的输出，计算每个单词的总次数<br>
+func reduceFunction(mappedData map[string]int) map[string]int {<br>
+reducedData := make(map[string]int)<br>
+for word, count := range mappedData {<br>
+reducedData[word] += count<br>
+}<br>
+return reducedData<br>
+}<br>
+// 将结果写入到文件中<br>
+func writeResultToFile(result map[string]int, outputFilename string) {<br>
+file, err := os.Create(outputFilename)<br>
+if err != nil {<br>
+panic(err)<br>
+}<br>
+defer file.Close()<br>
+writer := bufio.NewWriter(file)<br>
+for word, count := range result {<br>
+fmt.Fprintf(writer, &ldquo;%s  %d\n&rdquo;, word, count)<br>
+}<br>
+writer.Flush()<br>
+}<br>
+func main() {<br>
+// Map阶段<br>
+mappedData := mapFunction(&ldquo;input.txt&rdquo;)<br>
+// Reduce阶段<br>
+reducedData := reduceFunction(mappedData)<br>
+// 输出结果到文件<br>
+writeResultToFile(reducedData, &ldquo;output.txt&rdquo;)<br>
+fmt.Println(&ldquo;MapReduce job completed. Results written to output.txt&rdquo;)<br>
+}</p></blockquote>
+<p>执行命令：go run MapReduce.go<br>
+<img src="../blogImg/MapReduce4.PNG" alt="Alt text"></p>
+<p>output.txt文件内容如下：<br>
+<img src="../blogImg/MapReduce5.PNG" alt="Alt text"></p>
+
+    </div>
+    <a href="/posts/mapreduce-for-nosql/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/mapreduce/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>paper <a href="https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf">link</a></p>
+<h1 id="1介绍">1.介绍</h1>
+<p>MapReduce 是一种用于处理和生成大规模数据集的编程模型。它将数据处理分为两个主要阶段：Map 和 Reduce，从而实现对大数据的并行计算和分布式处理。MapReduce的设计目标是能够在计算机集群上高效处理TB级甚至PB级的数据集。</p>
+<h1 id="2编程模型">2.编程模型</h1>
+<p>例如大型文档集合中每个单词出现次数的问题，我们可以使用MapReduce处理，下文将默认处理该问题。</p>
+<h2 id="21example">2.1Example</h2>
+<p>伪代码：</p>
+<blockquote>
+<p>map(String key, String value):<br>
+// key: document name<br>
+// value: document contents<br>
+for each word w in value:<br>
+EmitIntermediate(w, &ldquo;1&rdquo;);<br>
+reduce(String key, Iterator values):<br>
+// key: a word<br>
+// values: a list of counts<br>
+int result = 0;<br>
+for each v in values:<br>
+result += ParseInt(v);<br>
+Emit(AsString(result));</p></blockquote>
+<p>map函数发出每个单词加上一个相关的出现次数计数(在这个简单的示例中只有&rsquo; 1 &lsquo;)。reduce函数将针对特定单词发出的所有计数求和。
+mapTask函数具体实现：</p>
+<blockquote>
+<p>func mapTask(mapf func(string, string) []KeyValue, file string, mapID int, nReduce int) (map[string][]KeyValue, error) {<br>
+// 读取文件内容<br>
+content, err := os.ReadFile(file)<br>
+if err != nil {<br>
+return nil, fmt.Errorf(&ldquo;cannot read file %v: %v&rdquo;, file, err)<br>
+}<br>
+// 调用用户提供的 map 函数生成键值对<br>
+kvs := mapf(file, string(content))<br>
+// 初始化中间数据<br>
+intermediateData := make(map[string][]KeyValue)<br>
+// 初始化中间文件和编码器<br>
+intermediateFiles := make([]*os.File, nReduce)<br>
+encoders := make([]*json.Encoder, nReduce)<br>
+for i := 0; i &lt; nReduce; i++ {<br>
+intermediateFileName := fmt.Sprintf(&ldquo;mr-%d-%d&rdquo;, mapID, i)<br>
+intermediateFile, err := os.Create(intermediateFileName)<br>
+if err != nil {<br>
+log.Printf(&ldquo;Worker: Cannot create intermediate file %s: %v&rdquo;, intermediateFileName, err)<br>
+return nil, fmt.Errorf(&ldquo;cannot create intermediate file %s: %v&rdquo;, intermediateFileName, err)<br>
+}<br>
+defer intermediateFile.Close()<br>
+intermediateFiles[i] = intermediateFile<br>
+encoders[i] = json.NewEncoder(intermediateFile)<br>
+}<br>
+// 对每个键值对进行哈希，根据哈希值决定写入哪个Reduce任务的中间文件<br>
+for _, kv := range kvs {<br>
+reduceTask := ihash(kv.Key) % nReduce<br>
+if err := encoders[reduceTask].Encode(&amp;kv); err != nil {<br>
+log.Printf(&ldquo;Worker: Cannot encode intermediate data for reduce task %d: %v&rdquo;, reduceTask, err)<br>
+return nil, fmt.Errorf(&ldquo;cannot encode intermediate data for reduce task %d: %v&rdquo;, reduceTask, err)<br>
+}<br>
+intermediateData[fmt.Sprintf(&ldquo;mr-%d-%d&rdquo;, mapID, reduceTask)] = append(intermediateData[fmt.Sprintf(&ldquo;mr-%d-%d&rdquo;, mapID, reduceTask)], kv)<br>
+}<br>
+return intermediateData, nil<br>
+}</p></blockquote>
+<p>reduceTask函数具体实现：</p>
+<blockquote>
+<p>func reduceTask(reducef func(string, []string) string, reduceID int, nMap int) error {<br>
+intermediate := []KeyValue{}<br>
+// 读取所有中间文件并解析键值对<br>
+for i := 0; i &lt; nMap; i++ {<br>
+intermediateFileName := fmt.Sprintf(&ldquo;mr-%d-%d&rdquo;, i, reduceID)<br>
+file, err := os.Open(intermediateFileName)<br>
+if err != nil {<br>
+return fmt.Errorf(&ldquo;cannot open intermediate file %s: %v&rdquo;, intermediateFileName, err)<br>
+}<br>
+dec := json.NewDecoder(file)<br>
+for {<br>
+var kv KeyValue<br>
+if err := dec.Decode(&amp;kv); err != nil {<br>
+if err.Error() == &ldquo;EOF&rdquo; {<br>
+break<br>
+}<br>
+return fmt.Errorf(&ldquo;error decoding intermediate file %s: %v&rdquo;, intermediateFileName, err)<br>
+}<br>
+intermediate = append(intermediate, kv)<br>
+}<br>
+defer file.Close() // 确保在每次读取文件后关闭文件<br>
+}<br>
+// 按键排序<br>
+sort.Slice(intermediate, func(i, j int) bool {<br>
+return intermediate[i].Key &lt; intermediate[j].Key<br>
+})<br>
+// 创建输出文件<br>
+outputFileName := fmt.Sprintf(&ldquo;mr-out-%d&rdquo;, reduceID)<br>
+ofile, err := os.Create(outputFileName)<br>
+if err != nil {<br>
+return fmt.Errorf(&ldquo;cannot create output file %s: %v&rdquo;, outputFileName, err)<br>
+}<br>
+defer ofile.Close()<br>
+// Reduce阶段，按键合并相同的键，并调用用户定义的Reduce函数<br>
+i := 0<br>
+for i &lt; len(intermediate) {<br>
+j := i + 1<br>
+// 找出所有具有相同键的值<br>
+for j &lt; len(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key {<br>
+j++<br>
+}<br>
+values := []string{}<br>
+for k := i; k &lt; j; k++ {<br>
+values = append(values, intermediate[k].Value)<br>
+}<br>
+// 调用用户提供的Reduce函数处理值<br>
+output := reducef(intermediate[i].Key, values)<br>
+// 按指定格式输出结果<br>
+fmt.Fprintf(ofile, &ldquo;%v %v\n&rdquo;, intermediate[i].Key, output)<br>
+i = j<br>
+}<br>
+return nil<br>
+}</p></blockquote>
+<h2 id="22执行概述">2.2执行概述</h2>
+<p><img src="../blogImg/%E6%89%A7%E8%A1%8C%E6%A6%82%E8%BF%B0.PNG" alt="Alt text"></p>
+<p>Map阶段：在Map阶段，输入数据被分成多个小片段（称为分片，split），每个分片都作为一个键值对（key-value pair）传递给Map函数。Map函数对输入的键值对进行处理，然后生成一组中间的键值对。这些中间键值对通常会按照键进行分组，以便后续的Reduce阶段进行处理。
+例如，如果我们想统计一个文本文件中每个单词出现的次数，Map函数的输入是文件中的每一行（作为value），每一行被分割成单词，然后Map函数输出一个单词和计数值（初始为1）的键值对。</p>
+<p>有一个特殊的master和多个由master分配的worker。
+有M个map任务和R个reduce任务要分配。master选择空闲的worker，并为每个worker分配一个map任务或reduce任务。</p>
+<p>一个被分配Map任务的worker需要从切片中读取内容，从中解析出key/value对后传入用户定义的map方法，map方法产生的中间key/value对放在内存缓冲区中。</p>
+<p>这些key/value对周期性的写入磁盘，它们在磁盘的位置被传递给master，master将这些数据分配给执行reduce任务的worker。</p>
+<p>当reduce worker读取了所有中间数据后，它按中间键对数据进行排序，以便将所有出现的相同键分组在一起。</p>
+<p>reduce worker遍历所有的中间数据，将每个唯一的中间数据传给用户定义的reduce函数。</p>
+<h2 id="23master-data-structures">2.3Master Data Structures</h2>
+<p>Master结构体的定义举例：</p>
+<blockquote>
+<p>type Master struct {<br>
+files            []string                      // 输入文件列表<br>
+nReduce          int                           // reduce 任务数量<br>
+mapTasks         int                           // map 任务数量<br>
+reduceTasks      int                           // reduce 任务数量<br>
+taskStatus       map[int]string                // 任务状态<br>
+taskMutex        sync.Mutex                    // 互斥锁<br>
+done             bool                          // 任务是否完成<br>
+intermediateData map[int]map[string][]KeyValue // 中间数据<br>
+taskTimeout      map[int]time.Time             // 任务超时时间<br>
+timeout          time.Duration                 // 任务超时时间间隔<br>
+}</p></blockquote>
+<h2 id="24分配任务">2.4分配任务</h2>
+<p>下面是分配任务函数（GetTask）例子：</p>
+<blockquote>
+<p>func (m *Master) GetTask(args *TaskRequest, reply *TaskReply) error {<br>
+m.taskMutex.Lock()<br>
+defer m.taskMutex.Unlock()<br>
+// 检查是否所有任务都已完成<br>
+if m.done {<br>
+reply.TaskType = &quot;&quot; // 显式设置为空的任务类型以表示没有更多任务<br>
+return nil<br>
+}<br>
+now := time.Now()<br>
+taskAssigned := false<br>
+// 首先检查是否有所有 Map 任务完成<br>
+allMapCompleted := true<br>
+for i := 0; i &lt; m.mapTasks; i++ {<br>
+status, ok := m.taskStatus[i]<br>
+if !ok || status != &ldquo;completed&rdquo; {<br>
+allMapCompleted = false<br>
+break<br>
+}<br>
+}<br>
+if !allMapCompleted {<br>
+// 分配 Map 任务<br>
+for i := 0; i &lt; m.mapTasks; i++ {<br>
+status, ok := m.taskStatus[i]<br>
+if (!ok || status == &ldquo;pending&rdquo;) || (status == &ldquo;in-progress&rdquo; &amp;&amp; now.Sub(m.taskTimeout[i]) &gt; m.timeout) {<br>
+reply.TaskType = string(Map)<br>
+reply.TaskID = i<br>
+reply.NMap = len(m.files)<br>
+reply.File = m.files[i]<br>
+reply.NReduce = m.nReduce<br>
+reply.Data = make(map[string][]KeyValue)<br>
+m.taskStatus[i] = &ldquo;in-progress&rdquo;<br>
+m.taskTimeout[i] = now<br>
+taskAssigned = true<br>
+break<br>
+}<br>
+}<br>
+} else {<br>
+// 如果所有 Map 任务完成，分配 Reduce 任务<br>
+for i := 0; i &lt; m.reduceTasks; i++ {<br>
+status, ok := m.taskStatus[i+m.mapTasks]<br>
+if (!ok || status == &ldquo;pending&rdquo;) || (status == &ldquo;in-progress&rdquo; &amp;&amp; now.Sub(m.taskTimeout[i+m.mapTasks]) &gt; m.timeout) {<br>
+reply.TaskType = string(Reduce)<br>
+reply.TaskID = i + m.mapTasks<br>
+reply.NMap = len(m.files)<br>
+reply.ReduceID = i<br>
+reply.NReduce = m.nReduce<br>
+reply.Data = make(map[string][]KeyValue)<br>
+m.taskStatus[i+m.mapTasks] = &ldquo;in-progress&rdquo;<br>
+m.taskTimeout[i+m.mapTasks] = now<br>
+taskAssigned = true<br>
+break<br>
+}<br>
+}<br>
+}<br>
+if taskAssigned {<br>
+return nil<br>
+}<br>
+// 如果没有可分配的任务，检查所有任务是否完成<br>
+allCompleted := true<br>
+for _, status := range m.taskStatus {<br>
+if status != &ldquo;completed&rdquo; {<br>
+allCompleted = false<br>
+break<br>
+}<br>
+}<br>
+if allCompleted {<br>
+m.done = true<br>
+reply.TaskType = &quot;&quot; // 没有更多任务时显式设置为空<br>
+}<br>
+return nil<br>
+}</p></blockquote>
+<h1 id="3高可用">3.高可用</h1>
+<h2 id="31worker宕机">3.1worker宕机</h2>
+<p>master定期ping每个worker。如果在一定时间内没有收到来自worker的响应，则master将该worker标记为失败。工作线程完成的任何maptask都被重置回其初始空闲状态，因此可以在其他工作线程上调度。在失败的worker上正在进行的任何map任务或reducetask也被重置为空闲，并有资格重新调度。
+完成的map任务在发生故障时重新执行，因为它们的输出存储在故障机器的本地磁盘上，因此无法访问。
+完成的reduce任务不需要重新执行，因为它们的输出存储在全局文件系统中。当map任务首先由worker A执行，然后由worker B执行(因为A失败)时，master会通知执行reduce任务的worker重执行。任何尚未从worker A读取数据的reduce任务都将从worker B读取数据。</p>
+<h2 id="32master宕机">3.2master宕机</h2>
+<p>master定期将它维护的关键数据结构（如任务状态、资源分配信息等）写入检查点（checkpoint）。如果master宕机了，系统可以从最后一次检查点的状态恢复，而不需要从头开始整个计算。
+如果master的任务失败（即master宕机或崩溃），可以从最后一次检查点的状态重新启动一个新的master副本。这个新的master将从保存的检查点状态中恢复，继续进行MapReduce计算。</p>
+
+    </div>
+    <a href="/posts/mapreduce/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/miniob-b&#43;%E6%A0%91/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-b树介绍">1. B+树介绍</h1>
+<p>B+树是一种平衡的树形数据结构，通常用于数据库和文件系统等需要频繁进行磁盘存取的大型数据管理系统。它是B树的扩展版本，具有更高效的查询和范围查询能力。B+树的设计初衷是为了优化磁盘存取的效率，因而在处理大规模数据时非常适合。</p>
+<h2 id="11-b树的结构特点">1.1 B+树的结构特点</h2>
+<p>所有关键字都出现在叶子节点：<br>
+B+树与B树的主要区别之一是，B+树中所有的关键字都存储在叶子节点中，内部节点只存储索引信息。叶子节点按照关键字的顺序排列，并通过指针连接，形成一个有序的链表。</p>
+<p>内节点只存储索引而不存储数据：<br>
+B+树的非叶子节点（内节点）不存储实际数据，它们只是用于指引查询路径的索引，指向子树或叶子节点。</p>
+<p>所有叶子节点在同一层：<br>
+B+树是高度平衡的，即所有叶子节点都在同一层，确保查询操作的时间复杂度为<code>O(log n)</code>，其中<code>n</code>是数据项的总数。</p>
+<p>叶子节点链表结构：<br>
+叶子节点之间是有序链表，意味着在进行范围查询时，可以通过叶子节点的顺序访问快速获取一组连续的结果。</p>
+<h2 id="12-b树的优点">1.2 B+树的优点</h2>
+<p>范围查询性能优异：<br>
+由于叶子节点之间的链表结构，B+树在处理范围查询时表现极为优秀，可以从起始位置沿着链表顺序读取。</p>
+<p>磁盘I/O优化：<br>
+B+树的设计目标是减少磁盘I/O操作。内节点不存储实际数据，因此可以将更多的索引节点放入内存中，减少从磁盘读取数据的次数。</p>
+<p>平衡性：<br>
+B+树是一种平衡树，保证了插入、删除、查询操作的时间复杂度始终保持在<code>O(log n)</code>。</p>
+<p>存储密度高：<br>
+由于内节点不存储数据，B+树可以将更多的索引节点放入内存，从而有效利用系统的缓存。</p>
+<h2 id="13-b树的应用场景">1.3 B+树的应用场景</h2>
+<p>数据库系统：<br>
+在关系型数据库中，B+树常用于实现索引，如MySQL中的InnoDB存储引擎就使用B+树作为其主键索引结构。</p>
+<p>文件系统：<br>
+一些文件系统，如NTFS，也采用B+树来管理文件和目录数据。</p>
+<p>大规模数据存储：<br>
+B+树特别适合需要在磁盘中管理大规模数据的场景，能够很好地处理磁盘I/O。</p>
+<h2 id="14-b树与b树的区别">1.4 B+树与B树的区别</h2>
+<p>数据存储位置：<br>
+B树的数据既存储在内节点也存储在叶子节点，而B+树的数据只存储在叶子节点。</p>
+<p>范围查询效率：<br>
+由于B+树的叶子节点构成链表结构，进行范围查询时可以直接从链表中遍历，而B树则需要更多的树遍历操作。</p>
+<p>节点结构：<br>
+B+树的内节点更为紧凑，因为它们只存储索引，而B树的内节点存储索引和数据。</p>
+<h1 id="2-b树在miniob的应用">2. B+树在miniob的应用</h1>
+<h2 id="21-b树的结构与节点">2.1 B+树的结构与节点</h2>
+<h3 id="211-indexfileheader">2.1.1 <code>IndexFileHeader</code></h3>
+<p><code>IndexFileHeader</code>：<br>
+用于存储 B+ 树的元数据，包括根节点页面编号、内部节点和叶子节点的最大大小、属性长度等。</p>
+<pre tabindex="0"><code>struct IndexFileHeader
+{
+  IndexFileHeader()
+  {
+    memset(this, 0, sizeof(IndexFileHeader));
+    root_page = BP_INVALID_PAGE_NUM;
+  }
+  PageNum  root_page;          ///&lt; 根节点在磁盘中的页号
+  int32_t  internal_max_size;  ///&lt; 内部节点最大的键值对数
+  int32_t  leaf_max_size;      ///&lt; 叶子节点最大的键值对数
+  int32_t  attr_length;        ///&lt; 键值的长度
+  int32_t  key_length;         ///&lt; attr length + sizeof(RID)
+  AttrType attr_type;          ///&lt; 键值的类型
+
+  const string to_string() const
+  {
+    stringstream ss;
+
+    ss &lt;&lt; &#34;attr_length:&#34; &lt;&lt; attr_length &lt;&lt; &#34;,&#34;
+       &lt;&lt; &#34;key_length:&#34; &lt;&lt; key_length &lt;&lt; &#34;,&#34;
+       &lt;&lt; &#34;attr_type:&#34; &lt;&lt; attr_type_to_string(attr_type) &lt;&lt; &#34;,&#34;
+       &lt;&lt; &#34;root_page:&#34; &lt;&lt; root_page &lt;&lt; &#34;,&#34;
+       &lt;&lt; &#34;internal_max_size:&#34; &lt;&lt; internal_max_size &lt;&lt; &#34;,&#34;
+       &lt;&lt; &#34;leaf_max_size:&#34; &lt;&lt; leaf_max_size &lt;&lt; &#34;;&#34;;
+
+    return ss.str();
+  }
+};
+</code></pre><p><code>PageNum root_page</code>：<br>
+该变量存储了根节点在磁盘中的页号，用于指示B+树在文件系统中的存储位置。<code>BP_INVALID_PAGE_NUM</code> 表示一个无效的页号。<br>
+<code>int32_t internal_max_size</code>：<br>
+这是内部节点中可以存储的最大键值对数。对于一个B+树的内部节点而言，它存储的是索引信息和指向子节点的指针，因此这个值决定了内部节点的分裂和合并策略。<br>
+<code>int32_t leaf_max_size</code>：<br>
+叶子节点可以存储的最大键值对数。叶子节点中存储的是实际的数据，定义了B+树中叶子节点的存储容量，影响了B+树的深度和查找效率。<br>
+<code>int32_t attr_length</code>：<br>
+键值的长度，通常是指数据库中索引字段的长度。它决定了每个键在树中占据的空间大小。<br>
+<code>int32_t key_length</code>：<br>
+该变量表示键值的总长度，即 <code>attr_length</code> 加上 <code>sizeof(RID)</code>，其中 <code>RID </code>是数据库中的记录标识符（Record ID）。这样可以存储索引键及其对应的记录位置。<br>
+<code>AttrType attr_type</code>：<br>
+键值的类型，定义了索引所依赖的属性类型（如整数、字符串等）。该枚举类型用于描述键值的实际数据类型。</p>
+<p><code>to_string </code>函数:<br>
+它将结构体的关键字段都格式化为一个字符串，输出属性长度、键长度、属性类型、根页号、内部节点和叶子节点的最大容量等信息,方便调试或输出。</p>
+<h3 id="212-indexnode">2.1.2 <code>IndexNode</code></h3>
+<p><code>IndexNode</code>：<br>
+通用的 B+ 树节点结构，包括页面类型、键值对数量以及父节点的页面编号。</p>
+<pre tabindex="0"><code>struct IndexNode
+{
+  static constexpr int HEADER_SIZE = 12;
+
+  bool    is_leaf;  /// 当前是叶子节点还是内部节点
+  int     key_num;  /// 当前页面上一共有多少个键值对
+  PageNum parent;   /// 父节点页面编号
+};
+</code></pre><h3 id="213-leafindexnode">2.1.3 <code>LeafIndexNode</code></h3>
+<p><code>LeafIndexNode</code>：<br>
+叶子节点的结构，存储实际的数据和指向下一个兄弟节点的指针。</p>
+<pre tabindex="0"><code>struct LeafIndexNode : public IndexNode
+{
+  static constexpr int HEADER_SIZE = IndexNode::HEADER_SIZE + 4;
+
+  PageNum next_brother;
+
+  char array[0];
+};
+</code></pre><h3 id="214-internalindexnode">2.1.4 <code>InternalIndexNode</code></h3>
+<p><code>InternalIndexNode</code>：<br>
+内部节点的结构，存储键值和子页面编号。</p>
+<pre tabindex="0"><code>struct InternalIndexNode : public IndexNode
+{
+  static constexpr int HEADER_SIZE = IndexNode::HEADER_SIZE;
+
+  char array[0];
+};  
+</code></pre><h2 id="22-b树的操作">2.2 B+树的操作</h2>
+<h3 id="221-插入操作">2.2.1 插入操作</h3>
+<p>通过 <code>insert_entry</code> 方法将键值对插入 B+ 树中。如果叶子节点或内部节点满了，调用 <a href="#241-%E5%88%86%E8%A3%82"><code>split</code></a> 方法进行节点分裂。</p>
+<pre tabindex="0"><code>RC BplusTreeHandler::insert_entry(const char *user_key, const RID *rid)
+{
+  if (user_key == nullptr || rid == nullptr) {
+    LOG_WARN(&#34;Invalid arguments, key is empty or rid is empty&#34;);
+    return RC::INVALID_ARGUMENT;
+  }
+
+  MemPoolItem::item_unique_ptr pkey = make_key(user_key, *rid);
+  if (pkey == nullptr) {
+    LOG_WARN(&#34;Failed to alloc memory for key.&#34;);
+    return RC::NOMEM;
+  }
+
+  RC rc = RC::SUCCESS;
+
+  BplusTreeMiniTransaction mtr(*this, &amp;rc);
+
+  char *key = static_cast&lt;char *&gt;(pkey.get());
+
+  if (is_empty()) {
+    root_lock_.lock();
+    if (is_empty()) {
+      rc = create_new_tree(mtr, key, rid);
+      root_lock_.unlock();
+      return rc;
+    }
+    root_lock_.unlock();
+  }
+
+  Frame *frame = nullptr;
+
+  rc = find_leaf(mtr, BplusTreeOperationType::INSERT, key, frame);
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;Failed to find leaf %s. rc=%d:%s&#34;, rid-&gt;to_string().c_str(), rc, strrc(rc));
+    return rc;
+  }
+
+  rc = insert_entry_into_leaf_node(mtr, frame, key, rid);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;Failed to insert into leaf of index, rid:%s. rc=%s&#34;, rid-&gt;to_string().c_str(), strrc(rc));
+    return rc;
+  }
+
+  LOG_TRACE(&#34;insert entry success&#34;);
+  return RC::SUCCESS;
+}
+</code></pre><p><code>const char *user_key</code>：<br>
+用户提供的键值，表示需要插入到B+树中的数据。<br>
+<code>const RID *rid</code>：<br>
+记录标识符（Record ID），用于唯一标识一条记录在数据库中的位置。每个<code>user_key</code>都有一个对应的<code>rid</code>。</p>
+<p>输入检查：<br>
+在插入操作之前，首先检查 <code>user_key</code> 和<code>rid</code>是否为空，确保输入参数的合法性。如果为空，则记录一个警告日志并返回 <code>RC::INVALID_ARGUMENT</code> 错误码。<br>
+创建键的副本：<br>
+使用 <code>make_key</code> 函数将 <code>user_key</code> 和 <code>rid</code> 组合成一个键值对，并使用智能指针 <code>MemPoolItem::item_unique_ptr</code> 来管理其内存。如果内存分配失败，返回 <code>RC::NOMEM</code>。<br>
+<code>BplusTreeMiniTransaction mtr(*this, &amp;rc);</code>:<br>
+创建一个 <code>BplusTreeMiniTransaction</code> 对象，这个对象通常用于管理B+树的事务操作，确保在插入操作过程中的一致性和并发控制。<code>mtr</code> 表示事务对象，它会跟踪并处理插入过程中可能发生的错误。<br>
+空树处理：<br>
+如果当前B+树为空（即还没有根节点），使用 <code>root_lock_</code> 锁定根节点，并调用 <code>create_new_tree</code> 来创建一个新树结构。这种情况下，插入操作直接返回创建树的结果。<code>is_empty()</code> 判断树是否为空，通过双重检查锁机制避免重复创建树。<br>
+查找叶子节点：<br>
+使用<code>find_leaf</code>函数根据 <code>key </code>找到适合插入的叶子节点。<code>find_leaf</code> 是查找叶子节点的核心操作之一，它将遍历B+树直到找到包含此键的叶子节点。如果查找失败（<code>OB_FAIL(rc)</code>），记录警告日志并返回相应的错误码。<br>
+插入叶子节点：<br>
+找到目标叶子节点后，调用 <code>insert_entry_into_leaf_node</code> 函数，将 <code>key </code>和 <code>rid</code> 插入到叶子节点中。</p>
+<h3 id="222-删除操作">2.2.2 删除操作</h3>
+<p>通过 <code>delete_entry</code> 方法删除键值对。删除时如果节点数量小于最小容量，则可能需要合并相邻节点或重新分配节点中的元素。</p>
+<pre tabindex="0"><code>RC BplusTreeHandler::delete_entry_internal(BplusTreeMiniTransaction &amp;mtr, Frame *leaf_frame, const char *key)
+{
+  LeafIndexNodeHandler leaf_index_node(mtr, file_header_, leaf_frame);
+
+  const int remove_count = leaf_index_node.remove(key, key_comparator_);
+  if (remove_count == 0) {
+    LOG_TRACE(&#34;no data need to remove&#34;);
+    // disk_buffer_pool_-&gt;unpin_page(leaf_frame);
+    return RC::RECORD_NOT_EXIST;
+  }
+  // leaf_index_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+
+  leaf_frame-&gt;mark_dirty();
+
+  if (leaf_index_node.size() &gt;= leaf_index_node.min_size()) {
+    return RC::SUCCESS;
+  }
+
+  return coalesce_or_redistribute&lt;LeafIndexNodeHandler&gt;(mtr, leaf_frame);
+}
+
+RC BplusTreeHandler::delete_entry(const char *user_key, const RID *rid)
+{
+  MemPoolItem::item_unique_ptr pkey = mem_pool_item_-&gt;alloc_unique_ptr();
+  if (nullptr == pkey) {
+    LOG_WARN(&#34;Failed to alloc memory for key. size=%d&#34;, file_header_.key_length);
+    return RC::NOMEM;
+  }
+  char *key = static_cast&lt;char *&gt;(pkey.get());
+
+  memcpy(key, user_key, file_header_.attr_length);
+  memcpy(key + file_header_.attr_length, rid, sizeof(*rid));
+
+  BplusTreeOperationType op = BplusTreeOperationType::DELETE;
+
+  RC rc = RC::SUCCESS;
+
+  BplusTreeMiniTransaction mtr(*this, &amp;rc);
+
+  Frame *leaf_frame = nullptr;
+
+  rc = find_leaf(mtr, op, key, leaf_frame);
+  if (rc == RC::EMPTY) {
+    rc = RC::RECORD_NOT_EXIST;
+    return rc;
+  }
+
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;failed to find leaf page. rc =%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = delete_entry_internal(mtr, leaf_frame, key);
+  return rc;
+}
+</code></pre><p><code>delete_entry</code>函数：B+树删除操作的入口。<br>
+内存分配并构造删除键：<br>
+首先从内存池 <code>mem_pool_item_</code> 分配一个指向 <code>key </code>的内存指针。如果分配失败，则记录警告日志并返回<code>RC::NOMEM</code>错误码。<br>
+然后将<code>user_key</code>和<code>rid</code>组合成一个键，存储在<code>key</code>变量中。这一步是将用户提供的键和记录ID合并成一个可以在B+树中查找和删除的完整键。<br>
+查找叶子节点：<br>
+创建一个 <code>BplusTreeMiniTransaction</code> 来保证B+树在操作中的一致性。<br>
+使用<code>find_leaf</code>函数根据<code>key</code>找到目标叶子节点所在的页框<code> leaf_frame</code>。<br>
+如果返回值为 <code>RC::EMPTY</code>，表示B+树中没有数据，直接返回 <code>RC::RECORD_NOT_EXIST</code> 表示记录不存在。</p>
+<p><code>delete_entry_internal</code>函数：处理删除操作的核心逻辑。<br>
+删除键值对：<br>
+使用 <code>LeafIndexNodeHandler</code> 来处理叶子节点的操作，并通过 <code>remove</code> 函数尝试删除目标键。<br>
+<code>remove_count</code> 记录删除的键值对数量，如果为0，表示没有找到需要删除的键，记录日志并返回<code> RC::RECORD_NOT_EXIST</code>。<br>
+标记叶子节点为<code>dirty</code>：<code>leaf_frame-&gt;mark_dirty();</code><br>
+删除成功后，将叶子节点标记为“脏”，即需要写回磁盘。<br>
+检查节点是否需要合并或重分配：<br>
+检查叶子节点的当前大小是否大于等于最小值 <code>min_size</code>，如果是，表示节点仍然保持平衡，不需要进一步处理，返回 <code>RC::SUCCESS</code>。<br>
+如果节点的大小小于最小值，调用 <code>coalesce_or_redistribute</code> 函数，尝试将节点与相邻节点合并或从相邻节点中重分配一些数据，以维持B+树的平衡。</p>
+<h3 id="223-查找操作">2.2.3 查找操作</h3>
+<p><code>get_entry </code>方法用于查找指定的键值对，<code>find_leaf</code> 用于找到包含指定键值的叶子节点。</p>
+<pre tabindex="0"><code>RC BplusTreeHandler::get_entry(const char *user_key, int key_len, list&lt;RID&gt; &amp;rids)
+{
+  BplusTreeScanner scanner(*this);
+  RC rc = scanner.open(user_key, key_len, true /*left_inclusive*/, user_key, key_len, true /*right_inclusive*/);
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;failed to open scanner. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  RID rid;
+  while ((rc = scanner.next_entry(rid)) == RC::SUCCESS) {
+    rids.push_back(rid);
+  }
+
+  scanner.close();
+  if (rc != RC::RECORD_EOF) {
+    LOG_WARN(&#34;scanner return error. rc=%s&#34;, strrc(rc));
+  } else {
+    rc = RC::SUCCESS;
+  }
+  return rc;
+}
+
+RC BplusTreeHandler::find_leaf(BplusTreeMiniTransaction &amp;mtr, BplusTreeOperationType op, const char *key, Frame *&amp;frame)
+{
+  auto child_page_getter = [this, key](InternalIndexNodeHandler &amp;internal_node) {
+    return internal_node.value_at(internal_node.lookup(key_comparator_, key));
+  };
+  return find_leaf_internal(mtr, op, child_page_getter, frame);
+}
+</code></pre><p><code>get_entry </code>函数:<br>
+用于根据给定的<code>user_key</code>从B+树中找到对应的记录ID列表<code> rids</code>，它主要使用了一个<a href="#25-b%E6%A0%91%E7%9A%84%E6%89%AB%E6%8F%8F"><code>BplusTreeScanner</code></a>来扫描树中的符合条件的键。<br>
+初始化<code> BplusTreeScanner</code>：<br>
+首先初始化一个 <code>BplusTreeScanner</code> 对象，这个对象负责遍历和扫描B+树的节点。<br>
+调用 <code>scanner.open()</code> 来设置扫描的范围。这里扫描范围设定为从<code>user_key</code>开始，<code>left_inclusive</code> 和 <code>right_inclusive</code> 表示是否包含边界键，即此处是查找等于 <code>user_key</code> 的条目。<br>
+遍历并获取记录ID：<br>
+使用 <code>scanner.next_entry(rid)</code> 不断获取下一个满足条件的 <code>RID</code>。每次成功获取到 <code>RID</code> 后，将其添加到 <code>rids</code> 列表中。<br>
+关闭扫描器并返回结果：<br>
+在完成扫描后，调用<code>scanner.close()</code>关闭扫描器。</p>
+<p><code>find_leaf </code>函数:<br>
+用于在B+树中查找包含特定<code>key</code>的叶子节点，它通过递归遍历树的内部节点，直到找到目标叶子节点。<br>
+查找子节点页号的回调函数: <br>
+定义一个<code>child_page_getter</code>lambda 函数，用于从内部节点获取子节点的页号。<br>
+<code>internal_node.lookup(key_comparator_, key)</code> 会根据 <code>key </code>使用 <code>key_comparator_ </code>来查找在内部节点中的位置，并通过<code>value_at()</code>获取对应子节点的页号。<br>
+调用 <code>find_leaf_internal</code>：<br>
+传入事务对象 <code>mtr</code>、操作类型 <code>op</code>（如删除、插入等）、获取子节点页号的 <code>child_page_getter</code> 以及页框 <code>frame</code>。</p>
+<h2 id="23-b树的事务">2.3 B+树的事务</h2>
+<p><code>BplusTreeMiniTransaction</code>：用于封装 MiniOB 中的 B+ 树事务。</p>
+<pre tabindex="0"><code>class BplusTreeMiniTransaction final
+{
+public:
+
+  BplusTreeMiniTransaction(BplusTreeHandler &amp;tree_handler, RC *operation_result = nullptr);
+  ~BplusTreeMiniTransaction();
+
+  LatchMemo       &amp;latch_memo() { return latch_memo_; }
+  BplusTreeLogger &amp;logger() { return logger_; }
+
+  RC commit();
+  RC rollback();
+
+private:
+  BplusTreeHandler &amp;tree_handler_;
+  RC               *operation_result_ = nullptr;
+  LatchMemo         latch_memo_;
+  BplusTreeLogger   logger_;
+};
+</code></pre><p><code>BplusTreeMiniTransaction(BplusTreeHandler &amp;tree_handler, RC *operation_result = nullptr)</code>：<br>
+构造函数，接收一个<code>BplusTreeHandler</code>对象作为参数，这个对象代表了对 B+ 树的具体操作管理。<br>
+参数 operation_result 是一个指向 <code>RC</code>（返回码）的指针。如果不为 <code>nullptr</code>，在事务结束时，会根据操作结果来决定是否提交或回滚。<br>
+该构造函数通常会在事务开始时被调用，负责初始化事务对象，准备后续的操作。<br>
+<code>~BplusTreeMiniTransaction()</code>：<br>
+析构函数，负责清理事务资源。如果在事务结束之前没有显式地调用 <code>commit()</code> 或 <code>rollback()</code>，析构函数可能会处理未决的事务，确保不会有未提交或未回滚的操作残留。<br>
+<code>RC commit()</code>：<br>
+该函数用于提交事务。当事务中的所有操作都成功执行时，调用 <code>commit()</code> 会将操作的结果提交到B+树，并将相关的日志清除或标记为已完成。<br>
+<code>RC rollback()</code>：<br>
+该函数用于回滚事务。在事务执行过程中，如果发生错误或操作失败，调用 <code>rollback()</code> 会撤销事务中的所有修改，恢复到操作前的状态。<br>
+回滚操作使用 <code>BplusTreeLogger</code> 中记录的日志来还原之前的状态。</p>
+<p><code>tree_handler_</code> 是对 B+ 树操作的管理器，它负责对 B+ 树执行实际的操作。事务类通过与 <code>tree_handler_</code> 交互来进行树的插入、删除、查找等操作。<br>
+<code>operation_result_</code> 是一个返回码的指针，用来标记事务执行过程中的状态。如果这个指针不为空，事务结束时会根据它的值来自动决定是否提交或回滚。<br>
+<code>latch_memo_</code> 是一个锁定机制的记忆记录对象,跟踪事务期间获取的锁定资源，确保在事务结束时能够正确释放资源，避免死锁或资源泄漏。<br>
+<code>logger_ </code>是事务操作的日志记录器，它会记录事务期间对 B+ 树进行的所有操作，以便在事务回滚时能够还原数据，或者在崩溃恢复时重新应用事务。</p>
+<h2 id="24-b树的分裂与合并">2.4 B+树的分裂与合并</h2>
+<h3 id="241-分裂">2.4.1 分裂</h3>
+<p>当节点满时，<code>split </code>方法将节点分裂成两个，并将中间的键插入到父节点。</p>
+<pre tabindex="0"><code>template &lt;typename IndexNodeHandlerType&gt;
+RC BplusTreeHandler::split(BplusTreeMiniTransaction &amp;mtr, Frame *frame, Frame *&amp;new_frame)
+{
+  IndexNodeHandlerType old_node(mtr, file_header_, frame);
+
+  // add a new node
+  RC rc = mtr.latch_memo().allocate_page(new_frame);
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;Failed to split index page due to failed to allocate page, rc=%d:%s&#34;, rc, strrc(rc));
+    return rc;
+  }
+
+  mtr.latch_memo().xlatch(new_frame);
+
+  IndexNodeHandlerType new_node(mtr, file_header_, new_frame);
+  new_node.init_empty();
+  new_node.set_parent_page_num(old_node.parent_page_num());
+
+  old_node.move_half_to(new_node);
+
+  frame-&gt;mark_dirty();
+  new_frame-&gt;mark_dirty();
+  return RC::SUCCESS;
+}
+</code></pre><p>分配新页：为新节点分配页框并加锁。<br>
+移动数据：将旧节点的一半数据移动到新节点。<br>
+更新元数据：确保新节点继承旧节点的父节点关系。<br>
+标记修改：标记修改后的页框，以便事务提交时更新磁盘中的数据。</p>
+<h3 id="242-合并">2.4.2 合并</h3>
+<p>当删除导致节点中的元素过少时，<code>coalesce</code> 方法合并相邻节点。</p>
+<pre tabindex="0"><code>template &lt;typename IndexNodeHandlerType&gt;
+RC BplusTreeHandler::coalesce(
+    BplusTreeMiniTransaction &amp;mtr, Frame *neighbor_frame, Frame *frame, Frame *parent_frame, int index)
+{
+  InternalIndexNodeHandler parent_node(mtr, file_header_, parent_frame);
+
+  // 先区分出来左右节点
+  Frame *left_frame  = nullptr;
+  Frame *right_frame = nullptr;
+  if (index == 0) {
+    // neighbor node is at right
+    left_frame  = frame;
+    right_frame = neighbor_frame;
+    index++;
+  } else {
+    left_frame  = neighbor_frame;
+    right_frame = frame;
+    // neighbor is at left
+  }
+
+  // 把右边节点的数据复制到左边节点上去
+  IndexNodeHandlerType left_node(mtr, file_header_, left_frame);
+  IndexNodeHandlerType right_node(mtr, file_header_, right_frame);
+
+  parent_node.remove(index);
+  // parent_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+  RC rc = right_node.move_to(left_node);
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;failed to move right node to left. rc=%d:%s&#34;, rc, strrc(rc));
+    return rc;
+  }
+  // left_node.validate(key_comparator_);
+
+  // 叶子节点维护next_page指针
+  if (left_node.is_leaf()) {
+    LeafIndexNodeHandler left_leaf_node(mtr, file_header_, left_frame);
+    LeafIndexNodeHandler right_leaf_node(mtr, file_header_, right_frame);
+    left_leaf_node.set_next_page(right_leaf_node.next_page());
+  }
+
+  // 释放右边节点
+  mtr.latch_memo().dispose_page(right_frame-&gt;page_num());
+
+  // 递归的检查父节点是否需要做合并或者重新分配节点数据
+  return coalesce_or_redistribute&lt;InternalIndexNodeHandler&gt;(mtr, parent_frame);
+}
+</code></pre><p>确定左右节点：根据 <code>index</code> 来区分当前节点和相邻节点（左或右）。<br>
+删除父节点中的索引：移除父节点中与右节点对应的索引键。<br>
+合并左右节点：将右节点中的数据移动到左节点中，如果是叶子节点，更新其<code> next_page</code> 指针。<br>
+释放右节点：合并后释放右节点的资源。<br>
+递归处理父节点：合并完成后递归检查父节点，看看是否需要进一步的合并或重新分配。</p>
+<h3 id="243-重新分配">2.4.3 重新分配</h3>
+<p><code>redistribute </code>方法重新分配相邻节点中的元素以保持平衡。</p>
+<pre tabindex="0"><code>template &lt;typename IndexNodeHandlerType&gt;
+RC BplusTreeHandler::redistribute(BplusTreeMiniTransaction &amp;mtr, Frame *neighbor_frame, Frame *frame, Frame *parent_frame, int index)
+{
+  InternalIndexNodeHandler parent_node(mtr, file_header_, parent_frame);
+  IndexNodeHandlerType     neighbor_node(mtr, file_header_, neighbor_frame);
+  IndexNodeHandlerType     node(mtr, file_header_, frame);
+  if (neighbor_node.size() &lt; node.size()) {
+    LOG_ERROR(&#34;got invalid nodes. neighbor node size %d, this node size %d&#34;, neighbor_node.size(), node.size());
+  }
+  if (index == 0) {
+    // the neighbor is at right
+    neighbor_node.move_first_to_end(node);
+    // neighbor_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+    // node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+    parent_node.set_key_at(index + 1, neighbor_node.key_at(0));
+    // parent_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+  } else {
+    // the neighbor is at left
+    neighbor_node.move_last_to_front(node);
+    // neighbor_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+    // node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+    parent_node.set_key_at(index, node.key_at(0));
+    // parent_node.validate(key_comparator_, disk_buffer_pool_, file_id_);
+  }
+
+  neighbor_frame-&gt;mark_dirty();
+  frame-&gt;mark_dirty();
+  parent_frame-&gt;mark_dirty();
+
+  return RC::SUCCESS;
+}
+</code></pre><p>初始化节点和检查节点大小：准备好相邻节点、当前节点和父节点，确保相邻节点有足够的元素可以借出。<br>
+根据相邻节点的位置重新分配元素：<br>
+如果相邻节点在右侧，将右节点的第一个元素移动到当前节点的末尾，并更新父节点键值。<br>
+如果相邻节点在左侧，将左节点的最后一个元素移动到当前节点的开头，并更新父节点键值。<br>
+标记修改：标记所有被修改的节点页框，以便后续提交到磁盘。<br>
+返回结果：操作成功后返回 <code>RC::SUCCESS</code>。</p>
+<h2 id="25-b树的扫描">2.5 B+树的扫描</h2>
+<p><code>BplusTreeScanner </code>类允许对 B+ 树的范围扫描。可以设置左边界和右边界，扫描满足条件的键值对。</p>
+<pre tabindex="0"><code>class BplusTreeScanner
+{
+public:
+  BplusTreeScanner(BplusTreeHandler &amp;tree_handler);
+  ~BplusTreeScanner();
+
+  /**
+   * @brief 扫描指定范围的数据
+   * @param left_user_key 扫描范围的左边界，如果是null，则没有左边界
+   * @param left_len left_user_key 的内存大小(只有在变长字段中才会关注)
+   * @param left_inclusive 左边界的值是否包含在内
+   * @param right_user_key 扫描范围的右边界。如果是null，则没有右边界
+   * @param right_len right_user_key 的内存大小(只有在变长字段中才会关注)
+   * @param right_inclusive 右边界的值是否包含在内
+   * TODO 重构参数表示方法
+   */
+  RC open(const char *left_user_key, int left_len, bool left_inclusive, const char *right_user_key, int right_len,
+      bool right_inclusive);
+
+  /**
+   * @brief 获取下一条记录
+   *
+   * @param rid 当前默认所有值都是RID类型。对B+树来说并不是一个好的抽象
+   * @return RC RECORD_EOF 表示遍历完成
+   * TODO 需要增加返回 key 的接口
+   * @warning 不要在遍历时删除数据。删除数据会导致遍历器失效。
+   * 当前默认的走索引删除的逻辑就是这样做的，所以删除逻辑有BUG。
+   */
+  RC next_entry(RID &amp;rid);
+
+  /**
+   * @brief 关闭当前扫描器
+   * @details 可以不调用，在析构函数时会自动执行
+   */
+  RC close();
+
+private:
+  /**
+   * 如果key的类型是CHARS, 扩展或缩减user_key的大小刚好是schema中定义的大小
+   */
+  RC fix_user_key(const char *user_key, int key_len, bool want_greater, char **fixed_key, bool *should_inclusive);
+
+  void fetch_item(RID &amp;rid);
+
+  /**
+   * @brief 判断是否到了扫描的结束位置
+   */
+  bool touch_end();
+
+private:
+  bool                     inited_ = false;
+  BplusTreeHandler        &amp;tree_handler_;
+  BplusTreeMiniTransaction mtr_;
+
+  /// 使用左右叶子节点和位置来表示扫描的起始位置和终止位置
+  /// 起始位置和终止位置都是有效的数据
+  Frame *current_frame_ = nullptr;
+
+  common::MemPoolItem::item_unique_ptr right_key_;
+  int                                  iter_index_    = -1;
+  bool                                 first_emitted_ = false;
+};
+</code></pre><p>初始化扫描器：<br>
+创建 <code>BplusTreeScanner </code>对象并调用<code>open</code>函数，设置扫描的范围（左边界和右边界）。<br>
+获取记录：<br>
+调用<code>next_entry</code>函数获取一条记录，并循环调用直到返回<code> RC::RECORD_EOF</code>，表示遍历完成。<br>
+关闭扫描器：<br>
+扫描完成后调用<code>close</code>函数关闭扫描器。关闭扫描器会释放相关资源，如果未显式调用，也会在析构函数中自动关闭。</p>
+<h2 id="26-b树的验证">2.6 B+树的验证</h2>
+<p>通过 <code>validate_tree </code>方法可以检查 B+ 树的合法性，包括节点之间的链接、键值的顺序等。</p>
+<pre tabindex="0"><code>bool BplusTreeHandler::validate_tree()
+{
+  if (is_empty()) {
+    return true;
+  }
+
+  BplusTreeMiniTransaction mtr(*this);
+  LatchMemo &amp;latch_memo = mtr.latch_memo();
+  Frame    *frame = nullptr;
+
+  RC rc = latch_memo.get_page(file_header_.root_page, frame);  // 这里仅仅调试使用，不加root锁
+  if (OB_FAIL(rc)) {
+    LOG_WARN(&#34;failed to fetch root page. page id=%d, rc=%d:%s&#34;, file_header_.root_page, rc, strrc(rc));
+    return false;
+  }
+
+  if (!validate_node_recursive(mtr, frame) || !validate_leaf_link(mtr)) {
+    LOG_WARN(&#34;Current B+ Tree is invalid&#34;);
+    print_tree();
+    return false;
+  }
+
+  LOG_INFO(&#34;great! current tree is valid&#34;);
+  return true;
+}
+</code></pre><p>结构验证：<br>
+<code>validate_tree </code>通过递归检查每个节点的结构（<code>validate_node_recursive</code>）和叶子节点的链表链接（<code>validate_leaf_link</code>），确保B+树的各个部分符合规范。<br>
+调试工具：<br>
+当树结构无效时，函数会打印整个树的结构，便于开发者进行调试和问题排查。</p>
+
+    </div>
+    <a href="/posts/miniob-b&#43;%E6%A0%91/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/miniob-bufferpool/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-buffer-pool缓冲池介绍">1. Buffer Pool（缓冲池）介绍</h1>
+<p>Buffer Pool 是数据库管理系统中用于管理和优化内存使用的一个关键组件。其主要作用是将磁盘上的数据页缓存在内存中，以减少对磁盘的访问次数，从而提高数据库的性能。大多数现代数据库（如 MySQL、PostgreSQL、OceanBase 等）都使用了 Buffer Pool 来加速读写操作。</p>
+<h2 id="11-buffer-pool-的核心组件">1.1 Buffer Pool 的核心组件</h2>
+<p>Page (页)：
+数据库以页（page）为单位管理数据。页是数据库中数据的最小管理单位，通常大小为4KB、8KB或16KB（具体取决于数据库的配置）。<br>
+Buffer Pool 中的每一个缓存块都会缓存一个磁盘上的数据页，当客户端请求某个数据时，数据库首先会检查该数据页是否已经在 Buffer Pool 中，如果在，就可以直接从内存读取数据；如果不在，则需要从磁盘加载该页到 Buffer Pool 中。<br>
+Buffer Frame (缓存帧)：<br>
+Buffer Pool 由多个 Buffer Frame 组成，每个 Frame 都可以存储一个数据库页。当数据库需要访问某个数据页时，如果该页已经在某个 Frame 中，那么这个 Frame 就会被直接返回。否则，将分配一个空的或可重用的 Frame 用来存储从磁盘读取的页。<br>
+Page Table (页表)：<br>
+Buffer Pool 维护一个页表（Page Table），用于记录每个数据页在 Buffer Pool 中的位置。通过页表，数据库可以快速找到某个数据页是否已经被缓存，以及它位于 Buffer Pool 中的哪个缓存帧。<br>
+Replacement Policy (替换策略)：<br>
+由于内存有限，Buffer Pool 无法无限制地缓存所有数据。当 Buffer Pool 已满时，数据库需要根据某种替换策略将某些页从 Buffer Pool 中移除，以便为新加载的页腾出空间。常见的替换策略包括：<br>
+<strong>LRU (Least Recently Used)：最久未使用的页会被优先替换。</strong><br>
+<strong>MRU (Most Recently Used)：最近使用的页会被优先替换。</strong><br>
+<strong>LFU (Least Frequently Used)：最少被访问的页会被优先替换。</strong><br>
+Dirty Page (脏页)：<br>
+当某个页的数据被修改时，该页称为脏页。脏页表示 Buffer Pool 中的数据已经与磁盘上的数据不一致，需要在合适的时候将脏页写回磁盘以保证数据的持久性。<br>
+数据库系统会通过后台线程定期地将脏页刷回到磁盘，或者在某些条件下强制刷新。</p>
+<h2 id="12-buffer-pool-的工作原理">1.2 Buffer Pool 的工作原理</h2>
+<p>读取数据：<br>
+当数据库接收到一个查询请求时，它首先检查所需的页是否在 Buffer Pool 中。<br>
+如果该页已经在 Buffer Pool 中，称为 &ldquo;命中&rdquo;（hit），系统可以直接从内存中读取数据。<br>
+如果该页不在 Buffer Pool 中，称为 &ldquo;未命中&rdquo;（miss），数据库系统需要从磁盘加载该页到 Buffer Pool 中，并将其存放在某个可用的缓存帧中。</p>
+<p>写入数据：<br>
+写入操作会首先修改 Buffer Pool 中相应页的内容，同时将该页标记为 &ldquo;脏页&rdquo;。<br>
+数据库不会立刻将脏页写回磁盘，而是会将写入请求缓存，等到合适的时机再批量地将脏页刷回磁盘，以提高写入效率。</p>
+<p>页替换：<br>
+当 Buffer Pool 已经满时，如果有新的页需要加载到 Buffer Pool 中，数据库会根据替换策略选择一个现有的页进行替换。<br>
+如果被替换的页是脏页，则需要在替换之前将其写回到磁盘。</p>
+<h1 id="2-buffer-pool在miniob中的实现">2. Buffer Pool在miniob中的实现</h1>
+<p>disk_buffer_pool.h 和 disk_buffer_pool.cpp:<br>
+文件定义了 <a href="#21-%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0"><code>DiskBufferPool</code></a> 类，它是 MiniOB 中缓冲池的核心实现。<code>DiskBufferPool</code> 负责将数据页从磁盘加载到内存，并管理这些页的内存缓存。
+该类提供了页面的分配 (<a href="#212-diskbufferpoolallocate_pageframe-frame"><code>allocate_page</code></a>)、读取 (<a href="#211-diskbufferpoolget_this_pagepagenum-page_num-frame-frame"><code>get_this_page</code></a>)、释放 (<a href="#214-rc-diskbufferpooldispose_pagepagenum-page_num"><code>dispose_page</code></a>) 以及将内存中的页面数据刷新回磁盘 (<a href="#213-diskbufferpoolflush_pageframe-frame"><code>flush_page</code></a>) 等功能。</p>
+<p>frame.h 和 frame.cpp:<br>
+文件定义了 <a href="#22-%E7%BC%93%E5%AD%98%E9%A1%B5%E6%A1%86%E6%9E%B6"><code>Frame</code></a> 类，表示缓冲池中的每一个缓存页框架。<code>Frame</code> 包含页框的元数据信息（如 <code>buffer_pool_id</code>, <code>page_num</code> 等），并通过 <code>pin</code> 和 <code>unpin </code>方法管理页面的引用计数。<br>
+<code>Frame </code>类还维护每个页面的脏页标记（<code>dirty_</code>），以及 <code>pin_count_</code> 用于防止正在使用的页面被替换。该类还负责页面的加锁与解锁操作。</p>
+<p>double_write_buffer.h 和 double_write_buffer.cpp:<br>
+文件实现了双写缓冲区机制 (DoubleWriteBuffer)，用于在写入磁盘之前将页面数据写入到一个临时的缓冲区。这是一种防止部分写入（partial write）问题的机制，确保在页面写入失败时仍然能够恢复数据。</p>
+<p><a href="#215-bpframemanager"><code>BPFrameManager </code></a>类:<br>
+该类管理所有的缓冲页框架（<code>Frame</code>）。当系统需要分配新的页面或释放已有页面时，它负责在缓存池中查找或分配空闲的页面框架，并确保内存使用的有效性。<br>
+它还实现了淘汰策略（<a href="#23-%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5"><code>purge_frames</code></a> 方法），以便在内存不足时释放不常用的页面。</p>
+<h2 id="21-核心实现">2.1 核心实现</h2>
+<p><code>DiskBufferPool</code>:</p>
+<pre tabindex="0"><code>class DiskBufferPool final
+{
+public:
+  DiskBufferPool(BufferPoolManager &amp;bp_manager, BPFrameManager &amp;frame_manager, DoubleWriteBuffer &amp;dblwr_manager,
+      LogHandler &amp;log_handler);
+  ~DiskBufferPool();
+
+  /**
+   * 根据文件名打开一个分页文件
+   */
+  RC open_file(const char *file_name);
+
+  /**
+   * 关闭分页文件
+   */
+  RC close_file();
+
+  /**
+   * 根据文件ID和页号获取指定页面到缓冲区，返回页面句柄指针。
+   */
+  RC get_this_page(PageNum page_num, Frame **frame);
+
+  /**
+   * @brief 在指定文件中分配一个新的页面，并将其放入缓冲区，返回页面句柄指针。
+   * @details 分配页面时，如果文件中有空闲页，就直接分配一个空闲页；
+   * 如果文件中没有空闲页，则扩展文件规模来增加新的空闲页。
+   */
+  RC allocate_page(Frame **frame);
+
+  /**
+   * @brief 释放某个页面，将此页面设置为未分配状态
+   *
+   * @param page_num 待释放的页面
+   */
+  RC dispose_page(PageNum page_num);
+
+  /**
+   * @brief 释放指定文件关联的页的内存
+   * 如果已经脏， 则刷到磁盘，除了pinned page
+   */
+  RC purge_page(PageNum page_num);
+  RC purge_all_pages();
+
+  /**
+   * @brief 用于解除pageHandle对应页面的驻留缓冲区限制
+   *
+   * 在调用GetThisPage或AllocatePage函数将一个页面读入缓冲区后，
+   * 该页面被设置为驻留缓冲区状态，以防止其在处理过程中被置换出去，
+   * 因此在该页面使用完之后应调用此函数解除该限制，使得该页面此后可以正常地被淘汰出缓冲区
+   */
+  RC unpin_page(Frame *frame);
+
+  /**
+   * 检查是否所有页面都是pin count == 0状态(除了第1个页面)
+   * 调试使用
+   */
+  RC check_all_pages_unpinned();
+
+  int file_desc() const;
+
+  /**
+   * 如果页面是脏的，就将数据刷新到double write buffer
+   */
+  RC flush_page(Frame &amp;frame);
+
+  /**
+   * 刷新所有页面到double write buffer，即使pin count不是0
+   */
+  RC flush_all_pages();
+
+  /**
+   * 回放日志时处理page0中已被认定为不存在的page
+   */
+  RC recover_page(PageNum page_num);
+
+  /**
+   * 刷新页面到磁盘
+   */
+  RC write_page(PageNum page_num, Page &amp;page);
+
+  RC redo_allocate_page(LSN lsn, PageNum page_num);
+  RC redo_deallocate_page(LSN lsn, PageNum page_num);
+
+public:
+  int32_t id() const { return buffer_pool_id_; }
+
+  const char *filename() const { return file_name_.c_str(); }
+
+protected:
+  RC allocate_frame(PageNum page_num, Frame **buf);
+
+  /**
+   * 刷新指定页面到磁盘(flush)，并且释放关联的Frame
+   */
+  RC purge_frame(PageNum page_num, Frame *used_frame);
+  RC check_page_num(PageNum page_num);
+
+  /**
+   * 加载指定页面的数据到内存中
+   */
+  RC load_page(PageNum page_num, Frame *frame);
+
+  /**
+   * 如果页面是脏的，就将数据刷新到磁盘
+   */
+  RC flush_page_internal(Frame &amp;frame);
+
+private:
+  BufferPoolManager   &amp;bp_manager_;     /// BufferPool 管理器
+  BPFrameManager      &amp;frame_manager_;  /// Frame 管理器
+  DoubleWriteBuffer   &amp;dblwr_manager_;  /// Double Write Buffer 管理器
+  BufferPoolLogHandler log_handler_;    /// BufferPool 日志处理器
+
+  int file_desc_ = -1;  /// 文件描述符
+  /// 由于在最开始打开文件时，没有正确的buffer pool id不能加载header frame，所以单独从文件中读取此标识
+  int32_t       buffer_pool_id_ = -1;
+  Frame        *hdr_frame_      = nullptr;  /// 文件头页面
+  BPFileHeader *file_header_    = nullptr;  /// 文件头
+  set&lt;PageNum&gt;  disposed_pages_;            /// 已经释放的页面
+
+  string file_name_;  /// 文件名
+
+  common::Mutex lock_;
+  common::Mutex wr_lock_;
+
+private:
+  friend class BufferPoolIterator;
+};
+</code></pre><h3 id="211-diskbufferpoolget_this_pagepagenum-page_num-frame-frame">2.1.1 <code>DiskBufferPool::get_this_page(PageNum page_num, Frame **frame)</code></h3>
+<p>从磁盘或内存中获取指定的页面。</p>
+<pre tabindex="0"><code>RC DiskBufferPool::get_this_page(PageNum page_num, Frame **frame) {
+  Frame *result_frame = nullptr;
+
+  // 检查页面是否已加载在缓冲区
+  result_frame = frame_manager_.get(buffer_pool_id_, page_num);
+  if (result_frame != nullptr) {
+    *frame = result_frame;
+    result_frame-&gt;pin();
+    return RC::SUCCESS;
+  }
+
+  // 如果页面不在缓冲区内，则从磁盘加载
+  RC rc = allocate_frame(page_num, &amp;result_frame);
+  if (rc != RC::SUCCESS) {
+    return rc;
+  }
+
+  rc = load_page(page_num, result_frame);
+  if (rc != RC::SUCCESS) {
+    free(buffer_pool_id_, page_num, result_frame);
+    return rc;
+  }
+
+  result_frame-&gt;pin();
+  *frame = result_frame;
+  return RC::SUCCESS;
+}
+</code></pre><p>首先检查页面是否已经在内存中的缓冲区（通过 <code>frame_manager_.get()</code> 方法）。如果存在，直接返回该页面，并增加 <code>pin</code> 计数。
+如果页面不在内存中，调用 <code>allocate_frame()</code> 函数分配一个新的 <code>Frame</code>，并通过 <code>load_page()</code> 函数从磁盘加载该页面到内存。
+成功加载页面后，增加<code> pin</code> 计数并返回。</p>
+<h3 id="212-diskbufferpoolallocate_pageframe-frame">2.1.2 <code>DiskBufferPool::allocate_page(Frame **frame)</code></h3>
+<p>分配一个新的页面到缓冲区。如果没有空闲页面，则扩展文件。</p>
+<pre tabindex="0"><code>RC DiskBufferPool::allocate_page(Frame **frame) {
+  // 确认是否有空闲页
+  if (file_header_-&gt;allocated_pages &gt;= file_header_-&gt;page_count) {
+    // 没有空闲页，扩展文件
+    RC rc = expand_file();
+    if (rc != RC::SUCCESS) {
+      return rc;
+    }
+  }
+
+  // 分配页面，更新位图状态
+  PageNum page_num = file_header_-&gt;allocated_pages++;
+  file_header_-&gt;bitmap[page_num / 8] |= (1 &lt;&lt; (page_num % 8));
+
+  // 分配帧
+  return allocate_frame(page_num, frame);
+}
+</code></pre><p>首先检查文件中是否还有空闲页，如果没有，则调用 <code>expand_file()</code> 来扩展文件。<br>
+成功扩展文件后，通过更新 <code>bitmap</code> 位图标记页面已分配。<br>
+使用 <code>allocate_frame()</code> 方法为该页面分配内存。</p>
+<h3 id="213-diskbufferpoolflush_pageframe-frame">2.1.3 <code>DiskBufferPool::flush_page(Frame &amp;frame)</code></h3>
+<p>将内存中的页面数据写回磁盘，确保页面的持久化。</p>
+<pre tabindex="0"><code>RC DiskBufferPool::flush_page(Frame &amp;frame) {
+  if (!frame.dirty()) {
+    return RC::SUCCESS;
+  }
+
+  // 将页面数据写入磁盘
+  RC rc = write_page(frame.page_num(), frame.page());
+  if (rc != RC::SUCCESS) {
+    return rc;
+  }
+
+  frame.clear_dirty();
+  return RC::SUCCESS;
+}
+</code></pre><p>先检查页面是否为脏页（<code>dirty()</code>），如果不是脏页，直接返回。<br>
+调用 <code>write_page()</code> 方法将页面数据写入磁盘。<br>
+写入成功后清除页面的脏标记，并返回成功状态。</p>
+<h3 id="214-rc-diskbufferpooldispose_pagepagenum-page_num">2.1.4 <code>RC DiskBufferPool::dispose_page(PageNum page_num)</code></h3>
+<p>该方法用于释放某个已分配的页面，将其从缓冲区和磁盘文件中标记为未分配状态。</p>
+<pre tabindex="0"><code>RC DiskBufferPool::dispose_page(PageNum page_num)
+{
+  if (page_num == 0) {
+    LOG_ERROR(&#34;Failed to dispose page %d, because it is the first page. filename=%s&#34;, page_num, file_name_.c_str());
+    return RC::INTERNAL;
+  }
+  
+  scoped_lock lock_guard(lock_);
+  Frame           *used_frame = frame_manager_.get(id(), page_num);
+  if (used_frame != nullptr) {
+    ASSERT(&#34;the page try to dispose is in use. frame:%s&#34;, used_frame-&gt;to_string().c_str());
+    frame_manager_.free(id(), page_num, used_frame);
+  } else {
+    LOG_DEBUG(&#34;page not found in memory while disposing it. pageNum=%d&#34;, page_num);
+  }
+
+  LSN lsn = 0;
+  RC rc = log_handler_.deallocate_page(page_num, lsn);
+  if (OB_FAIL(rc)) {
+    LOG_ERROR(&#34;Failed to log deallocate page %d, rc=%s&#34;, page_num, strrc(rc));
+    // ignore error handle
+  }
+
+  hdr_frame_-&gt;set_lsn(lsn);
+  hdr_frame_-&gt;mark_dirty();
+  file_header_-&gt;allocated_pages--;
+  char tmp = 1 &lt;&lt; (page_num % 8);
+  file_header_-&gt;bitmap[page_num / 8] &amp;= ~tmp;
+  return RC::SUCCESS;
+}
+</code></pre><p>检查页面号，确保文件头页面(<code>page_num</code>=0)不会被释放。<br>
+检查页面是否在内存中，如果在内存中则释放它。<br>
+记录日志操作，确保释放页面的操作可追溯。<br>
+更新文件头的页面分配计数和位图，确保页面释放状态同步到文件:<br>
+<code>hdr_frame_-&gt;set_lsn(lsn)</code>：将当前页面头文件的日志序列号（<code>LSN</code>）更新为最新的 <code>lsn</code>，确保日志顺序正确。<br>
+<code>hdr_frame_-&gt;mark_dirty()</code>：标记页面为脏页，表示页面头已经修改，在适当时机会将其刷回磁盘。<br>
+<code>file_header_-&gt;allocated_pages--</code>：减少文件头中记录的已分配页面的计数，表示有一个页面被释放。<br>
+位图更新：<code>bitmap</code> 用于跟踪页面的分配状态。通过 <code>file_header_-&gt;bitmap[page_num / 8] &amp;= ~tmp</code> 这行代码，清除对应页面的分配标记（使用按位与和按位取反操作），将页面标记为未分配。</p>
+<h3 id="215-bpframemanager">2.1.5 <code>BPFrameManager</code></h3>
+<pre tabindex="0"><code>class BPFrameManager
+{
+public:
+  BPFrameManager(const char *tag);
+
+  RC init(int pool_num);
+  RC cleanup();
+
+  /**
+   * @brief 获取指定的页面
+   *
+   * @param buffer_pool_id buffer Pool标识
+   * @param page_num  页面号
+   * @return Frame* 页帧指针
+   */
+  Frame *get(int buffer_pool_id, PageNum page_num);
+
+  /**
+   * @brief 列出所有指定文件的页面
+   *
+   * @param buffer_pool_id buffer Pool标识
+   * @return list&lt;Frame *&gt; 页帧列表
+   */
+  list&lt;Frame *&gt; find_list(int buffer_pool_id);
+
+  /**
+   * @brief 分配一个新的页面
+   *
+   * @param buffer_pool_id buffer Pool标识
+   * @param page_num 页面编号
+   * @return Frame* 页帧指针
+   */
+  Frame *alloc(int buffer_pool_id, PageNum page_num);
+
+  /**
+   * 尽管frame中已经包含了buffer_pool_id和page_num，但是依然要求
+   * 传入，因为frame可能忘记初始化或者没有初始化
+   */
+  RC free(int buffer_pool_id, PageNum page_num, Frame *frame);
+
+  /**
+   * 如果不能从空闲链表中分配新的页面，就使用这个接口，
+   * 尝试从pin count=0的页面中淘汰一些
+   * @param count 想要purge多少个页面
+   * @param purger 需要在释放frame之前，对页面做些什么操作。当前是刷新脏数据到磁盘
+   * @return 返回本次清理了多少个页面
+   */
+  int purge_frames(int count, function&lt;RC(Frame *frame)&gt; purger);
+
+  size_t frame_num() const { return frames_.count(); }
+
+  /**
+   * 测试使用。返回已经从内存申请的个数
+   */
+  size_t total_frame_num() const { return allocator_.get_size(); }
+
+private:
+  Frame *get_internal(const FrameId &amp;frame_id);
+  RC     free_internal(const FrameId &amp;frame_id, Frame *frame);
+
+private:
+  class BPFrameIdHasher
+  {
+  public:
+    size_t operator()(const FrameId &amp;frame_id) const { return frame_id.hash(); }
+  };
+
+  using FrameLruCache  = common::LruCache&lt;FrameId, Frame *, BPFrameIdHasher&gt;;
+  using FrameAllocator = common::MemPoolSimple&lt;Frame&gt;;
+
+  mutex          lock_;
+  FrameLruCache  frames_;
+  FrameAllocator allocator_;
+};
+</code></pre><h2 id="22-缓存页框架">2.2 缓存页框架</h2>
+<p><code>Frame</code>:</p>
+<pre tabindex="0"><code>class Frame
+{
+public:
+  ~Frame()
+  {
+    // LOG_DEBUG(&#34;deallocate frame. this=%p, lbt=%s&#34;, this, common::lbt());
+  }
+
+  /**
+   * @brief reinit 和 reset 在 MemPoolSimple 中使用
+   * @details 在 MemPoolSimple 分配和释放一个Frame对象时，不会调用构造函数和析构函数，
+   * 而是调用reinit和reset。
+   */
+  void reinit() {}
+  void reset() {}
+
+  void clear_page() { memset(&amp;page_, 0, sizeof(page_)); }
+
+  int  buffer_pool_id() const { return frame_id_.buffer_pool_id(); }
+  void set_buffer_pool_id(int id) { frame_id_.set_buffer_pool_id(id); }
+
+  /**
+   * @brief 在磁盘和内存中内容完全一致的数据页
+   * @details 磁盘文件划分为一个个页面，每次从磁盘加载到内存中，也是一个页面，就是 Page。
+   * frame 是为了管理这些页面而维护的一个数据结构。
+   */
+  Page &amp;page() { return page_; }
+
+  /**
+   * @brief 每个页面都有一个编号
+   * @details 当前页面编号记录在了页面数据中，其实可以不记录，从磁盘中加载时记录在Frame信息中即可。
+   */
+  PageNum page_num() const { return frame_id_.page_num(); }
+  void    set_page_num(PageNum page_num) { frame_id_.set_page_num(page_num); }
+  FrameId frame_id() const { return frame_id_; }
+
+  /**
+   * @brief 为了实现持久化，需要将页面的修改记录记录到日志中，这里记录了日志序列号
+   * @details 如果当前页面从磁盘中加载出来时，它的日志序列号比当前WAL(Write-Ahead-Logging)中的一些
+   * 序列号要小，那就可以从日志中读取这些更大序列号的日志，做重做操作，将页面恢复到最新状态，也就是redo。
+   */
+  LSN  lsn() const { return page_.lsn; }
+  void set_lsn(LSN lsn) { page_.lsn = lsn; }
+
+  /**
+   * @brief 页面校验和
+   * @details 用于校验页面完整性。如果页面写入一半时出现异常，可以通过校验和检测出来。
+   */
+  CheckSum check_sum() const { return page_.check_sum; }
+  void     set_check_sum(CheckSum check_sum) { page_.check_sum = check_sum; }
+
+  /**
+   * @brief 刷新当前内存页面的访问时间
+   * @details 由于内存是有限的，比磁盘要小很多。那当我们访问某些文件页面时，可能由于内存不足
+   * 而要淘汰一些页面。我们选择淘汰哪些页面呢？这里使用了LRU算法，即最近最少使用的页面被淘汰。
+   * 最近最少使用，采用的依据就是访问时间。所以每次访问某个页面时，我们都要刷新一下访问时间。
+   */
+  void access();
+
+  /**
+   * @brief 标记指定页面为“脏”页。
+   * @details 如果修改了页面的内容，则应调用此函数，
+   * 以便该页面被淘汰出缓冲区时系统将新的页面数据写入磁盘文件
+   */
+  void mark_dirty() { dirty_ = true; }
+
+  /**
+   * @brief 重置“脏”标记
+   * @details 如果页面已经被写入磁盘文件，则应调用此函数。
+   */
+  void clear_dirty() { dirty_ = false; }
+  bool dirty() const { return dirty_; }
+
+  char *data() { return page_.data; }
+
+  bool can_purge() { return pin_count_.load() == 0; }
+
+  /**
+   * @brief 给当前页帧增加引用计数
+   * pin通常都会加着frame manager锁来访问。
+   * 当我们访问某个页面时，我们不期望此页面被淘汰，所以我们会增加引用计数。
+   */
+  void pin();
+
+  /**
+   * @brief 释放一个当前页帧的引用计数
+   * 与pin对应，但是通常不会加着frame manager的锁来访问
+   */
+  int unpin();
+  int pin_count() const { return pin_count_.load(); }
+
+  void write_latch();
+  void write_latch(intptr_t xid);
+
+  void write_unlatch();
+  void write_unlatch(intptr_t xid);
+
+  void read_latch();
+  void read_latch(intptr_t xid);
+  bool try_read_latch();
+
+  void read_unlatch();
+  void read_unlatch(intptr_t xid);
+
+  string to_string() const;
+
+private:
+  friend class BufferPool;
+
+  bool          dirty_ = false;
+  atomic&lt;int&gt;   pin_count_{0};
+  unsigned long acc_time_ = 0;
+  FrameId       frame_id_;
+  Page          page_;
+
+  /// 在非并发编译时，加锁解锁动作将什么都不做
+  common::RecursiveSharedMutex lock_;
+
+  /// 使用一些手段来做测试，提前检测出头疼的死锁问题
+  /// 如果编译时没有增加调试选项，这些代码什么都不做
+  common::DebugMutex           debug_lock_;
+  intptr_t                     write_locker_          = 0;
+  int                          write_recursive_count_ = 0;
+  unordered_map&lt;intptr_t, int&gt; read_lockers_;
+};
+</code></pre><p><code>Frame::pin()</code>：<br>
+增加页面的 <code>pin_count_</code> 计数，防止页面被淘汰。</p>
+<p><code>Frame::unpin()</code>:<br>
+减少页面的 <code>pin_count_</code> 计数，当 <code>pin_count_</code> 归零时，允许页面被淘汰。</p>
+<p><code>Frame::mark_dirty()</code>:<br>
+标记页面为脏页，表示页面已被修改，需要在合适的时机将数据写回磁盘。</p>
+<p><code>Frame::write_latch()</code>:<br>
+为当前页面加写锁，确保在写入时不被其他线程访问。</p>
+<p><code>Frame::access()</code>:<br>
+更新页面的访问时间，用于替换策略，标识页面最近一次被访问的时间。</p>
+<h2 id="23-淘汰策略">2.3 淘汰策略</h2>
+<pre tabindex="0"><code>int BPFrameManager::purge_frames(int count, function&lt;RC(Frame *frame)&gt; purger)
+{
+  lock_guard&lt;mutex&gt; lock_guard(lock_);
+
+  vector&lt;Frame *&gt; frames_can_purge;
+  if (count &lt;= 0) {
+    count = 1;
+  }
+  frames_can_purge.reserve(count);
+
+  auto purge_finder = [&amp;frames_can_purge, count](const FrameId &amp;frame_id, Frame *const frame) {
+    if (frame-&gt;can_purge()) {
+      frame-&gt;pin();
+      frames_can_purge.push_back(frame);
+      if (frames_can_purge.size() &gt;= static_cast&lt;size_t&gt;(count)) {
+        return false;  // false to break the progress
+      }
+    }
+    return true;  // true continue to look up
+  };
+
+  frames_.foreach_reverse(purge_finder);
+  LOG_INFO(&#34;purge frames find %ld pages total&#34;, frames_can_purge.size());
+
+  /// 当前还在frameManager的锁内，而 purger 是一个非常耗时的操作
+  /// 他需要把脏页数据刷新到磁盘上去，所以这里会极大地降低并发度
+  int freed_count = 0;
+  for (Frame *frame : frames_can_purge) {
+    RC rc = purger(frame);
+    if (RC::SUCCESS == rc) {
+      free_internal(frame-&gt;frame_id(), frame);
+      freed_count++;
+    } else {
+      frame-&gt;unpin();
+      LOG_WARN(&#34;failed to purge frame. frame_id=%s, rc=%s&#34;, 
+               frame-&gt;frame_id().to_string().c_str(), strrc(rc));
+    }
+  }
+  LOG_INFO(&#34;purge frame done. number=%d&#34;, freed_count);
+  return freed_count;
+}
+</code></pre><p>查找可淘汰的页面:<br>
+定义一个 <code>purge_finder</code> lambda 函数，该函数用于遍历缓存中的所有页面，并将符合条件（可以淘汰）的页面存储到 <code>frames_can_purge</code> 容器中。<br>
+<code>frame-&gt;can_purge()</code>：判断页面是否可以被淘汰，通常是通过 <code>pin_count == 0</code> 来判断页面是否正在使用，如果页面未被引用，则可以淘汰。<br>
+<code>frame-&gt;pin()</code>：对该页面执行 <code>pin</code> 操作，确保在当前线程使用该页面时，它不会被其他线程替换或释放。<br>
+如果已经找到了足够数量的页面（即<code> frames_can_purge.size() &gt;= count</code>），则返回 <code>false</code>，以终止遍历。<br>
+<code>frames_.foreach_reverse(purge_finder)</code>：遍历缓存池中的页面，查找可以被淘汰的页面，并存储在 <code>frames_can_purge</code> 中。该遍历是逆序进行的（<code>foreach_reverse</code>），可能是因为最近使用的页面排在队列的前面，而最近未使用的页面排在后面。</p>
+<p>执行淘汰操作:<br>
+初始化 <code>freed_count</code> 变量，用于统计成功淘汰的页面数量。<br>
+遍历 <code>frames_can_purge</code> 中的页面，并为每个页面调用传入的 <code>purger(frame)</code> 函数执行淘汰前的必要操作。<br>
+<code>purger(frame)</code>：这是一个用户提供的函数，通常用于将脏页（修改过但尚未刷盘的页面）写回磁盘。这个操作可能非常耗时，因此是关键步骤。<br>
+如果 <code>purger(frame)</code> 成功（返回 <code>RC::SUCCESS</code>），则调用 <code>free_internal()</code> 方法释放该页面，并增加已释放页面的计数 <code>freed_count</code>。<br>
+如果 <code>purger(frame)</code> 失败，调用 <code>frame-&gt;unpin()</code> 取消之前对页面的 <code>pin</code> 操作，并记录警告日志。</p>
+
+    </div>
+    <a href="/posts/miniob-bufferpool/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/miniob-debug-sql%E8%AF%AD%E5%8F%A5/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-使用miniob的debug">1. 使用miniob的DEBUG</h1>
+<p>miniob已经实现了<code>launch.json</code>和<code>tasks.json</code>，可以直接调试。<br>
+在<code>miniob/src/observer/net/sql_task_handler.cpp</code>中，直接找到<code>handle_sql</code>函数，打断点，调试即可。<br>
+<img src="../blogImg/debug2.PNG" alt="图片2"><br>
+<img src="../blogImg/debug3.PNG" alt="图片3"></p>
+<pre tabindex="0"><code>RC SqlTaskHandler::handle_sql(SQLStageEvent *sql_event)
+{
+  RC rc = query_cache_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do query cache. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = parse_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do parse. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = resolve_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do resolve. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = optimize_stage_.handle_request(sql_event);
+  if (rc != RC::UNIMPLEMENTED &amp;&amp; rc != RC::SUCCESS) {
+    LOG_TRACE(&#34;failed to do optimize. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  rc = execute_stage_.handle_request(sql_event);
+  if (OB_FAIL(rc)) {
+    LOG_TRACE(&#34;failed to do execute. rc=%s&#34;, strrc(rc));
+    return rc;
+  }
+
+  return rc;
+}
+</code></pre><h1 id="2-调试">2. 调试</h1>
+<p>打断点：<br>
+<img src="../blogImg/debug1.PNG" alt="图1"><br>
+开始调试：<br>
+键入<code>CREATE TABLE TEST (ID int)</code>,创建一个名为“TEST”的表,表含一个名为“ID”的整型字段。 <br>
+<img src="../blogImg/debug4.PNG" alt="图4"><br>
+解析阶段：<br>
+<img src="../blogImg/debug5.PNG" alt="图5"><br>
+解析完成后，生成语法树SQLNode：<br>
+<img src="../blogImg/debug6.PNG" alt="图6"><br>
+<code>CREATE TABLE</code>操作没有优化计划，返回<code>UNIMPLEMENTED</code>，直接进入执行阶段。<br>
+<img src="../blogImg/debug7.PNG" alt="图7"><br>
+进入执行器执行，输出SUCCESS。<br>
+<img src="../blogImg/debug8.PNG" alt="图8"><br>
+编译结束后执行<code>SHOW TABLES</code>命令查看所有表，确保成功创建表：<br>
+<img src="../blogImg/debug9.PNG" alt="图9"></p>
+
+    </div>
+    <a href="/posts/miniob-debug-sql%E8%AF%AD%E5%8F%A5/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/miniob-sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-sql语句执行流程">1. SQL语句执行流程</h1>
+<p>在MiniOB项目中，SQL语句的执行过程如下：</p>
+<h2 id="11-sql解析">1.1 SQL解析</h2>
+<p>当SQL语句被输入时，首先经过词法和语法分析器（如 Flex 和 Bison）解析成<code>SQLNode</code>。<code>SQLNode</code>是抽象语法树（AST）的组成部分，它表示SQL语句中的不同结构元素。</p>
+<h2 id="12-sqlnode转换为stmt">1.2 SQLNode转换为Stmt</h2>
+<p>在<code>Stmt</code>模块中，<code>SQLNode</code> 会被简单地判断，并根据不同的 SQL 语句类型（如<code> SELECT</code>、<code>INSERT</code>、<code>UPDATE</code> 等）生成相应的<code>Stmt</code>对象。<code>Stmt</code> 是逻辑语义的更高级别表示，用于执行逻辑分析和进一步优化。</p>
+<h2 id="13-生成逻辑算子">1.3 生成逻辑算子</h2>
+<p><code>Stmt</code>对象会被传递到逻辑分析阶段，生成对应的逻辑算子。逻辑算子表示操作的高层次语义（例如表扫描、连接、筛选等），但此时并不关心具体的执行方式。</p>
+<h2 id="14-生成物理算子">1.4 生成物理算子</h2>
+<p>在查询优化阶段，逻辑算子会被优化器转换为物理算子。物理算子代表查询的实际执行策略，例如顺序扫描、索引扫描、哈希连接等。优化器的作用是选择最优的执行方式，以提高查询效率。物理算子与存储模块之间有着直接的关联。物理算子负责执行具体的操作，而这些操作往往涉及对数据库中数据的实际读取、写入、更新和删除，这些操作需要与存储模块交互。</p>
+<h2 id="15-执行">1.5 执行</h2>
+<p>物理算子会由执行器执行，执行器根据物理算子生成的数据流，访问存储层并返回结果。</p>
+<h1 id="2-查询优化">2. 查询优化</h1>
+<p>查询优化 是在逻辑算子生成后和物理算子生成前执行的。这一步优化器根据逻辑算子生成多个执行方案（物理算子），并选择最优的执行方式。<br>
+优化的目标是提高查询效率，可能包括：<br>
+选择适当的索引：根据数据分布和查询条件选择最合适的索引。<br>
+连接顺序优化：对于多表连接，优化器会根据表的大小、索引等选择合适的连接顺序。<br>
+子查询优化：优化器可能将子查询重写为连接或其他形式以提高效率。<br>
+优化完成后，优化器会将逻辑算子转换为物理算子，物理算子负责执行具体的操作（如表扫描、索引查找等）。</p>
+<h1 id="3-中间传递">3. 中间传递</h1>
+<p><code>SQLStageEvent</code>类用于在SQL语句的不同阶段传递信息。在MiniOB项目的执行流程中,SQL语句的处理过程可以通过<code>SQLStageEvent</code>类将SQL相关的数据结构（如 <code>ParsedSqlNode</code>、<code>Stmt</code>、<code>PhysicalOperator</code>）在不同阶段之间传递。</p>
+<h2 id="31-示例">3.1 示例</h2>
+<ol>
+<li>解析阶段：<code>ParsedSqlNode</code> 被创建并设置为 <code>sql_node_</code>。</li>
+<li>语义分析阶段：将 <code>ParsedSqlNode</code> 转换为 <code>Stmt</code> 对象，并设置到 <code>stmt_</code> 中。</li>
+<li>执行计划生成阶段：基于 <code>Stmt</code> 生成 <code>PhysicalOperator</code>，并设置到 <code>operator_</code> 中。</li>
+<li>执行阶段：执行器通过 <code>PhysicalOperator</code> 来访问存储层，执行SQL语句。</li>
+</ol>
+
+    </div>
+    <a href="/posts/miniob-sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-介绍">1. 介绍</h1>
+<p>Nginx 内存池的实现是其高性能、高并发处理能力的重要组成部分之一。Nginx 的内存池主要用于高效管理内存，避免频繁的内存分配与释放操作，减少内存碎片，提升性能。Nginx 内存池的实现遵循“预分配一块内存，然后进行小块分配”的策略，类似于常见的内存池模型。<br>
+Nginx在 <a href="https://github.com/nginx/nginx/blob/master/src/core/ngx_palloc.h">ngx_palloc.h</a> 和 <a href="https://github.com/nginx/nginx/blob/master/src/core/ngx_palloc.c">ngx_palloc.c</a> 中实现了内存池。</p>
+<h1 id="2-内存池的实现原理">2. 内存池的实现原理</h1>
+<h2 id="21-nginx-内存池的结构">2.1 Nginx 内存池的结构</h2>
+<p><code>ngx_pool_s</code> 结构体是内存池的核心结构，它管理内存块的链表、内存池的大小信息、以及清理函数等。其定义如下：</p>
+<pre tabindex="0"><code>struct ngx_pool_s {
+    ngx_pool_data_t       d;         // 内存块的数据
+    size_t                max;       // 可从该内存池分配的最大内存块大小
+    ngx_pool_t           *current;   // 当前活跃的内存块
+    ngx_chain_t          *chain;     // 缓存链
+    ngx_pool_large_t     *large;     // 大块内存链表
+    ngx_pool_cleanup_t   *cleanup;   // 清理函数链表
+    ngx_log_t            *log;       // 日志对象
+};
+</code></pre><p>其中，ngx_pool_data_t 定义了每个内存块的元数据：</p>
+<pre tabindex="0"><code>typedef struct {
+    u_char      *last;    // 当前内存块中已使用的最后位置
+    u_char      *end;     // 当前内存块的末尾位置
+    ngx_pool_t  *next;    // 下一个内存块的指针
+    ngx_uint_t   failed;  // 分配失败次数
+} ngx_pool_data_t;
+</code></pre><h2 id="22-内存池的创建和销毁">2.2 内存池的创建和销毁</h2>
+<p><code>ngx_create_pool</code>函数用于创建一个内存池，分配一个初始大小为 size 的内存块，并初始化内存池的各种参数：</p>
+<pre tabindex="0"><code>ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log) {
+    ngx_pool_t *p;
+
+    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);  // 对齐分配内存
+    if (p == NULL) {
+        return NULL;
+    }
+
+    p-&gt;d.last = (u_char *) p + sizeof(ngx_pool_t);  // 初始化last指针
+    p-&gt;d.end = (u_char *) p + size;  // 指向内存块的末尾
+    p-&gt;d.next = NULL;  
+    p-&gt;d.failed = 0;
+
+    size = size - sizeof(ngx_pool_t);
+    p-&gt;max = (size &lt; NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL;  // 确定分配块的最大值
+
+    p-&gt;current = p;
+    p-&gt;chain = NULL;
+    p-&gt;large = NULL;
+    p-&gt;cleanup = NULL;
+    p-&gt;log = log;
+
+    return p;
+}
+</code></pre><p><code>ngx_destroy_pool</code>用于销毁内存池，会遍历内存池中的所有内存块、清理大块内存、并执行所有注册的清理函数：</p>
+<pre tabindex="0"><code>void ngx_destroy_pool(ngx_pool_t *pool) {
+    ngx_pool_t *p, *n;
+    ngx_pool_large_t *l;
+    ngx_pool_cleanup_t *c;
+
+    // 调用所有注册的清理函数
+    for (c = pool-&gt;cleanup; c; c = c-&gt;next) {
+        if (c-&gt;handler) {
+            c-&gt;handler(c-&gt;data);
+        }
+    }
+
+    // 释放大块内存
+    for (l = pool-&gt;large; l; l = l-&gt;next) {
+        if (l-&gt;alloc) {
+            ngx_free(l-&gt;alloc);
+        }
+    }
+
+    // 释放内存池中的所有内存块
+    for (p = pool, n = pool-&gt;d.next; /* void */; p = n, n = n-&gt;d.next) {
+        ngx_free(p);
+        if (n == NULL) {
+            break;
+        }
+    }
+}
+</code></pre><h1 id="3-内存池的分配策略">3. 内存池的分配策略</h1>
+<p>Nginx 内存池根据分配内存的大小来决定从哪里分配：<br>
+小块内存（小于 <code>max</code>）：从内存池的现有块中分配。<br>
+大块内存（大于 <code>max</code>）：直接从系统中分配内存并挂载到 <code>large</code> 链表中。</p>
+<h2 id="31-小块内存分配">3.1 小块内存分配</h2>
+<p>通过<code>ngx_palloc_small</code>函数完成。当要分配的内存块小于<code>max</code>时，它会从当前内存块中分配。</p>
+<pre tabindex="0"><code>static ngx_inline void *ngx_palloc_small(ngx_pool_t *pool, size_t size, ngx_uint_t align) {
+    u_char *m;
+    ngx_pool_t *p = pool-&gt;current;
+
+    do {
+        m = p-&gt;d.last;
+
+        if (align) {
+            m = ngx_align_ptr(m, NGX_ALIGNMENT);  // 地址对齐
+        }
+
+        if ((size_t) (p-&gt;d.end - m) &gt;= size) {
+            p-&gt;d.last = m + size;
+            return m;
+        }
+
+        p = p-&gt;d.next;  // 尝试下一个内存块
+    } while (p);
+
+    return ngx_palloc_block(pool, size);  // 若当前内存块不足，则分配新内存块
+}
+</code></pre><p><code>d.last</code>：检查当前内存块是否有足够空间可分配。</p>
+<h2 id="32-大块内存分配">3.2 大块内存分配</h2>
+<p>当需要分配的内存块大于 <code>max </code>时，调用 <code>ngx_palloc_large</code> 函数，它直接调用系统的内存分配函数，并将大块内存挂载到<code> large</code> 链表中管理。</p>
+<pre tabindex="0"><code>static void *ngx_palloc_large(ngx_pool_t *pool, size_t size) {
+    void *p = ngx_alloc(size, pool-&gt;log);  // 系统内存分配
+    if (p == NULL) {
+        return NULL;
+    }
+
+    ngx_pool_large_t *large = ngx_palloc_small(pool, sizeof(ngx_pool_large_t), 1);
+    if (large == NULL) {
+        ngx_free(p);
+        return NULL;
+    }
+
+    large-&gt;alloc = p;  // 将大块内存挂载到 large 链表中
+    large-&gt;next = pool-&gt;large;
+    pool-&gt;large = large;
+
+    return p;
+}
+</code></pre><h1 id="4-内存池的清理机制">4. 内存池的清理机制</h1>
+<p>Nginx 内存池支持注册清理函数，在销毁内存池时自动调用这些函数进行资源清理。</p>
+<p><code>ngx_pool_cleanup_add</code>函数用于注册清理函数。它会创建一个 <code>ngx_pool_cleanup_t </code>结构，并将其加入到内存池的清理链表中：</p>
+<pre tabindex="0"><code>ngx_pool_cleanup_t *ngx_pool_cleanup_add(ngx_pool_t *p, size_t size) {
+    ngx_pool_cleanup_t *c = ngx_palloc(p, sizeof(ngx_pool_cleanup_t));
+    if (c == NULL) {
+        return NULL;
+    }
+
+    if (size) {
+        c-&gt;data = ngx_palloc(p, size);
+        if (c-&gt;data == NULL) {
+            return NULL;
+        }
+    } else {
+        c-&gt;data = NULL;
+    }
+
+    c-&gt;handler = NULL;  // 清理函数指针
+    c-&gt;next = p-&gt;cleanup;
+    p-&gt;cleanup = c;
+
+    return c;
+}
+</code></pre>
+    </div>
+    <a href="/posts/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/paxos-%E5%88%86%E5%B8%83%E5%BC%8F%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>paper <a href="https://www.microsoft.com/en-us/research/uploads/prod/2016/12/paxos-simple-Copy.pdf">link</a></p>
+<h1 id="1-paxos算法介绍">1. Paxos算法介绍</h1>
+<p>Paxos 是一种用于 分布式系统 中达成一致性的算法，通常用于解决分布式系统中的 共识问题。它保证了即使在系统中的某些节点出现故障时，多个节点也能就某个值或状态达成一致。Paxos 主要用于在没有中央协调者的系统中确保数据的 一致性 和 可靠性。</p>
+<p>Paxos的工作流程可以分为三个主要角色和三个阶段。</p>
+<h2 id="11-三个主要角色">1.1 三个主要角色</h2>
+<pre tabindex="0"><code>1. Proposer：提议者，负责生成提议值，并发送提议消息给Acceptor，建议某个值成为共识值。  
+2. Acceptor：接受者，负责接收和存储提议。多数 Acceptor 接受提议后，该提议才能生效。  
+3. Learner：学习者，负责接收Acceptor的响应，学习最终达成的共识结果。  
+</code></pre><h2 id="12-三个阶段">1.2 三个阶段</h2>
+<pre tabindex="0"><code>1. Prepare 阶段：
+提议者向接受者发送提议，要求 Acceptor 表示是否愿意接受更高编号的提议。
+2. Promise 阶段：
+Acceptor 向 Proposer 承诺不会接受编号低于当前提议的其他提议。
+3. Accept 阶段：
+一旦提议获得大多数 Acceptor 的同意，Proposer 就可以宣布该提议通过，Learner 将会学习到最终的共识值。
+</code></pre><h2 id="13-paxos的关键特性">1.3 Paxos的关键特性</h2>
+<p>容错性：<br>
+即使部分节点故障（如网络分区或节点崩溃），Paxos 仍然可以正常工作，只要大多数节点（一般为超过半数的 Acceptor）正常工作。</p>
+<p>一致性：<br>
+所有节点最终都会达成一致的共识值，保证系统不会出现不同步的情况。</p>
+<p>可恢复性：<br>
+即使系统发生故障，恢复后 Paxos 仍能继续从上次中断的地方继续运行，不会丢失已经达成的共识。</p>
+<h1 id="2-一致性算法">2. 一致性算法</h1>
+<p>一致性算法是Paxos的核心。目的是在多个进程中达成一致选择某个值（即 共识），并提出了实现这种共识的 安全性要求。</p>
+<h2 id="21-共识问题的基本目标">2.1 共识问题的基本目标</h2>
+<p>共识算法的目标是确保在一组提议的值中，选择一个并让系统内的所有进程知道这个被选择的值。具体要求包括：</p>
+<pre tabindex="0"><code>如果没有提出任何值，那么不应选择任何值。
+如果已经选择了一个值，那么系统内的进程能够学习到这个被选择的值。
+</code></pre><h2 id="22-安全性要求">2.2 安全性要求</h2>
+<p>共识算法必须遵循以下 安全性要求：</p>
+<pre tabindex="0"><code>只能选择已提议的值：
+算法不能凭空选出一个没有被任何进程提议的值。
+只能选择单个值：
+即使有多个进程提出了不同的值，最终系统内只能有一个值被选择。
+只有在某个值实际被选中后，进程才能得知这个值：
+进程不能错误地认为一个值被选中了，除非这个值确实已经被选择。
+</code></pre><h2 id="23-活性要求">2.3 活性要求</h2>
+<p>虽然问题中没有精确描述活性要求，但提出了如下目标：</p>
+<pre tabindex="0"><code>某个提议的值最终应被选择：
+如果有进程提出了值，算法应该保证最终会选择某个值，而不是无限期等待。
+被选中的值应该能够被进程学习到：
+一旦某个值被选中，系统中的进程应能最终得知这个被选中的值。
+</code></pre><h2 id="24-通信模型">2.4 通信模型</h2>
+<p>系统中的代理（即提议者、接受者、学习者）之间通过 消息 通信，问题假设使用的是典型的 异步、非拜占庭模型，其特性包括：</p>
+<pre tabindex="0"><code>异步执行：
+代理的操作速度可以任意，可能会失效（崩溃）并重启。
+崩溃恢复：
+所有代理可能在值被选中后崩溃并重启，因此，系统必须记住一些信息，以便在重启后继续运行。否则，在没有任何信息恢复的情况下，算法是无法继续工作的。
+消息的不确定性：
+消息可能延迟、丢失、重复发送，但消息内容不会被篡改（即没有拜占庭错误）。
+</code></pre><h2 id="25-工作原理">2.5 工作原理</h2>
+<p>Paxos 算法被设计为在多个节点可能失效或消息丢失的情况下，仍然能够在这些节点之间达成共识。</p>
+<h3 id="251-初始方案单个接受者">2.5.1 初始方案：单个接受者</h3>
+<p>最简单的方案是只有一个 接受者（Acceptor），每当一个 提议者（Proposer） 提出值时，接受者会选择第一个接收到的提议值。然而，这个方案有明显的缺点：如果接受者失败，系统将无法继续前进。</p>
+<h3 id="252-改进方案多个接受者">2.5.2 改进方案：多个接受者</h3>
+<p>为了提高容错性，可以使用多个接受者。提议者会向一组接受者发送提议，提议值会在足够多的接受者接受后被认为是“选择的值”。“足够多”通常意味着多数接受者，这样可以确保至少有一个接受者在两个不同的多数集合中（即保证交集），从而保证不会有两个不同的值被同时选中。</p>
+<h3 id="253-避免冲突引入提议编号">2.5.3 避免冲突：引入提议编号</h3>
+<p>为了避免多个提议同时被不同的接受者接受，导致没有单一的多数值被选中，Paxos 引入了 提议编号。提议不仅包含一个值，还包含一个唯一的编号。编号确保提议的先后顺序，并规定较高编号的提议具有优先权。</p>
+<h3 id="254-安全性保证p2性质">2.5.4 安全性保证：P2性质</h3>
+<p>为了确保共识算法的安全性，必须保证如果一个值 <code>v</code> 已经被选中，那么所有编号更高的提议也必须选择相同的值 <code>v</code>。这一点是通过“P2 性质”来保证的，P2 确保选中值后，后续的提议不会违反已经达成的共识。</p>
+<h3 id="255-p2-性质的推导和扩展">2.5.5 P2 性质的推导和扩展</h3>
+<p>为了实现 <a href="#27-p2">P2</a>，系统需要满足以下约束：<code>当提议者发送新的提议时，它必须先确保没有较高编号的提议已经被接受。</code>这是通过发送 准备请求（prepare request） 来实现的，提议者要求接受者承诺不再接受任何比当前提议编号更低的提议，并报告其已接受的最高编号提议。基于这些信息，提议者可以确保新提议符合 P2 性质。</p>
+<h3 id="256-算法两个阶段">2.5.6 算法两个阶段</h3>
+<p>第一阶段：<br>
+提议者选择一个提议编号，并向多数接受者发送准备请求，要求接受者承诺不再接受任何比该编号低的提议，并返回已接受的最高编号提议（如果有）。<br>
+第二阶段：<br>
+如果提议者从多数接受者那里得到了响应，它会选择一个值，并向接受者发送 接受请求（accept request），要求接受者接受这个编号的提议。如果提议符合条件，接受者会接受该提议。</p>
+<h3 id="257-提议放弃与优化">2.5.7 提议放弃与优化</h3>
+<p>提议者可以在任意时间放弃提议，并且算法允许接受者忽略已经过时的准备请求或接受请求。如果接受者发现自己已经响应了更高编号的提议，则会忽略较低编号的提议。提议者也可以在发现有更高编号的提议正在进行时放弃当前提议，以提高算法效率。</p>
+<h3 id="258-数据持久性和容错">2.5.8 数据持久性和容错</h3>
+<p>为了应对节点崩溃或重启，Paxos 要求每个接受者记住它曾经响应过的最高编号提议和接受过的最高编号提议。这样，即使接受者重新启动，算法的安全性依然能够得到保证。</p>
+<h2 id="26-学习者learner-如何得知某个值已经被选择">2.6 学习者（Learner） 如何得知某个值已经被选择</h2>
+<p>核心问题是学习者如何从 接受者（Acceptor） 那里获悉被选中的提议（即被选中的值）。有几种方法可以实现这一点，分别在可靠性和通信开销之间做出了权衡。</p>
+<h3 id="261-简单算法每个接受者通知所有学习者">2.6.1 简单算法：每个接受者通知所有学习者</h3>
+<p>每当一个接受者接受了一个提议，它就通知所有的学习者该提议的信息。这种方式可以让学习者尽早知道被选中的值，但它的代价是通信开销非常大。接受者必须给每个学习者发送消息，消息的总数为 接受者数量 与 学习者数量 的乘积。这在规模较大的系统中通信开销会非常高。</p>
+<h3 id="262-优化方法引入特定学习者">2.6.2 优化方法：引入“特定学习者”</h3>
+<p>为了降低通信开销，可以引入一个“特定学习者（distinguished learner）”，所有接受者在接受提议后只通知这个特定的学习者。然后，特定学习者将被选中的值通知给其他学习者。这种方法减少了通信量，消息总数只等于 接受者数量 和 学习者数量 的总和。然而，这种方法增加了可靠性风险——如果特定学习者出现故障，系统就无法继续工作。</p>
+<h3 id="263-改进方法使用多个特定学习者">2.6.3 改进方法：使用多个特定学习者</h3>
+<p>为了提高系统的可靠性，可以使用多个特定学习者。每个接受者向这些特定学习者发送信息，然后这些特定学习者将值广播给其他学习者。这种方法在保持通信开销相对较低的同时提高了系统的容错性，因为即使一个特定学习者失败，其他特定学习者仍然可以通知学习者被选中的值。不过，增加特定学习者的数量也会提高通信复杂度。</p>
+<h3 id="264-消息丢失的处理">2.6.4 消息丢失的处理</h3>
+<p>由于 Paxos 是异步系统，消息可能丢失，导致一个值已经被选中但学习者却不知道。这种情况下，学习者可以向接受者询问他们接受的提议。但如果接受者出现故障，学习者可能无法得知多数接受者是否接受了某个提议。</p>
+<h3 id="265-提议者的作用">2.6.5 提议者的作用</h3>
+<p>如果学习者需要确切地知道是否有值被选中，它可以要求提议者发起一个新的提议。这样，即使当前没有学习到选定值，通过发起新的提议，学习者最终也能通过新的提议得知系统的共识。</p>
+<h2 id="27-p2">2.7 P2</h2>
+<p>在 Paxos 算法中，P2 性质 是保证算法安全性的重要条件。P2 性质的目的是确保一旦某个值 <code>v</code> 被选中后，所有将来被选中的提议（无论提议的编号如何）都必须具有相同的值 <code>v</code>，从而避免系统选出多个不同的值。</p>
+<p>P2 性质 规定：如果一个编号为 <code>m</code> 的提议的值 <code>v</code> 被选中，那么所有编号大于<code>m</code>的提议如果被选中，它们的值也必须是<code> v</code>。</p>
+<p>这一性质可以保证 Paxos 算法的安全性，即使有多个提议者并行发起不同的提议，最终选中的值也不会出现冲突。</p>
+<h3 id="271-p2-性质的意义">2.7.1 P2 性质的意义</h3>
+<p>通过 P2 性质的约束，可以确保：</p>
+<pre tabindex="0"><code>一旦某个值被多数接受者接受，那么所有后续的提议必须选择同一个值。
+不会有两个不同的值被不同的提议者选中。
+</code></pre><h3 id="272-p2-性质的实现">2.7.2 P2 性质的实现</h3>
+<pre tabindex="0"><code>在发出提议之前，提议者（Proposer） 需要向多数接受者（Acceptor）发送一个 准备请求（prepare request），询问他们已经接受的最高编号的提议。
+如果有接受者已经接受了某个编号较小的提议（例如，编号 m 的提议），那么提议者在发出新的提议时，必须使用已经被接受的编号 m 对应的值，而不能提出新的值。
+如果没有任何接受者接受过编号小于当前提议编号的提议，那么提议者可以自由选择一个新的值。
+</code></pre><h2 id="28-paxos-算法-中如何确保-进展性liveness">2.8 Paxos 算法 中如何确保 进展性（liveness）</h2>
+<p>在 Paxos 算法中，如果存在多个提议者（proposer），这些提议者可能会同时发起不同编号的提议。这样可能导致一个 活锁 场景：两个提议者不断地增加提议编号，但没有任何一个提议能被最终选中。具体过程如下：</p>
+<ol>
+<li>提议者 p 完成了编号为 n1 的第一阶段（Phase 1）。</li>
+<li>提议者 q 然后完成了编号为 n2 &gt; n1 的第一阶段，所有接受者（acceptor）现在都承诺不再接受任何编号小于 n2 的提议。</li>
+<li>当提议者 p 进入第二阶段并发送编号为 n1 的接受请求时，所有请求都被忽略，因为接受者已经承诺接受 n2 及更大的提议。</li>
+<li>提议者 p 重新开始，并完成了编号为 n3 &gt; n2 的新一轮提议，导致提议者 q 的编号为 n2 的第二阶段请求被忽略。</li>
+</ol>
+<h3 id="281-解决方案">2.8.1 解决方案</h3>
+<p>为了解决这一问题，Paxos 算法需要选出一个 特定提议者（distinguished proposer），即在特定时刻只有一个提议者能够发起提议。<br>
+关键点：</p>
+<pre tabindex="0"><code>如果这个特定提议者可以与多数接受者成功通信，并且使用一个大于任何已使用提议编号的新编号，那么它的提议将会成功被接受。
+如果提议者得知有编号更高的提议，它会放弃当前的提议，重新发起编号更高的提议，直到成功。
+</code></pre><p>进展性依赖于系统中以下条件的正常工作：</p>
+<pre tabindex="0"><code>提议者：需要有一个被选中的提议者来主导提议过程。
+接受者：接受者必须能够与特定提议者正常通信。
+网络通信：通信网络不能完全失效，消息必须能够在一定时间内传递。
+</code></pre><p>为了选出一个“特定提议者”，系统可能需要使用随机性或基于真实时间的机制，比如使用 超时（timeout） 机制来决定哪个提议者能够主导提议过程。</p>
+<h2 id="29-paxos-算法-的实现">2.9 Paxos 算法 的实现</h2>
+<h3 id="291-基本网络模型">2.9.1 基本网络模型</h3>
+<p>Paxos 算法假设在一个 分布式网络 中有多个进程。每个进程在 Paxos 中可以扮演多个角色，包括：提议者、接受者、学习者。<br>
+在实现中，Paxos 通过一个被选出的 领导者（Leader） 来扮演关键角色。领导者不仅是 特定提议者（distinguished proposer），还负责扮演 特定学习者（distinguished learner） 的角色。</p>
+<h3 id="292-消息通信机制">2.9.2 消息通信机制</h3>
+<p>Paxos 算法的通信基于普通的消息传递。在实际实现中，提议者、接受者、学习者之间通过发送和接收消息进行交互：<br>
+每条消息都会附带相应的 提议编号，这样可以防止不同提议者的消息被混淆，确保提议编号的唯一性和顺序性。</p>
+<h3 id="293-稳定存储的使用">2.9.3 稳定存储的使用</h3>
+<p>稳定存储（Stable storage） 是 Paxos 算法的关键部分之一，保证了在系统发生故障或节点重启的情况下，系统依然可以恢复之前的状态： <br>
+每个接受者在发送响应消息之前，会将其打算发送的响应信息记录在稳定存储中。这样即使系统发生故障，重启后接受者可以恢复并继续工作，不会丢失已经接受的提议信息。</p>
+<h3 id="294-提议编号的唯一性">2.9.4 提议编号的唯一性</h3>
+<p>Paxos 通过 唯一编号的提议 来避免冲突，即每个提议必须有一个唯一的编号，不能出现两个提议者发出相同编号的提议。为了实现这一点：<br>
+不同的提议者选择提议编号时，使用 不同的编号集合，确保每个提议者的提议编号不重叠。例如，提议者 A 可能从编号集合 <code>{1, 4, 7, 10...}</code> 选择，而提议者 B 则从集合<code>{2, 5, 8, 11...}</code>中选择。<br>
+每个提议者会在稳定存储中记录其曾经尝试发出的 最高编号提议。在开始新的提议时，提议者会选择一个比之前编号更大的编号，从而避免重复编号。</p>
+<h3 id="295-阶段-1-的启动">2.9.5 阶段 1 的启动</h3>
+<p>在 Paxos 的 阶段 1中，提议者发出准备请求（prepare request）以获取多数接受者的承诺。提议者会使用比之前尝试的提议编号更大的编号来启动这个阶段，确保提议的编号是唯一的并且不会与过去的提议冲突。</p>
+<h1 id="3-分布式状态机distributed-state-machine">3. 分布式状态机（distributed state machine）</h1>
+<h2 id="31-分布式状态机的基本概念">3.1 分布式状态机的基本概念</h2>
+<p>一个简单的分布式系统可以被看作是多个客户端向一个中央服务器发出命令，而这个服务器执行这些命令并更新其状态。服务器可以被描述为一个 确定性状态机（deterministic state machine）：</p>
+<pre tabindex="0"><code>状态机具有当前的状态，通过执行命令生成新的状态和输出。例如，在一个银行系统中，状态可以是用户的账户余额，命令可以是提款或存款操作。
+</code></pre><p>如果使用单个中央服务器，它的故障将导致整个系统失效。因此，实际实现中使用多个服务器来独立地实现状态机，并通过 Paxos 算法确保这些服务器都执行相同的命令序列。</p>
+<h2 id="32-状态机与-paxos-算法">3.2 状态机与 Paxos 算法</h2>
+<p>为了保证所有服务器执行相同的命令序列，系统为每个状态机命令运行一轮 Paxos 算法的实例。例如，第 i 个状态机命令是通过第 i 次 Paxos 共识算法实例决定的。所有服务器在 Paxos 算法中扮演提议者、接受者和学习者的角色，保证每个命令都能被最终确定。</p>
+<h2 id="33-领导者的选举和命令执行">3.3 领导者的选举和命令执行</h2>
+<p>在正常操作中，一个服务器会被选为 领导者（leader），它作为唯一的提议者来发布客户端的命令。领导者决定每个命令在命令序列中的位置，并尝试通过 Paxos 算法确保命令被选中。例如，如果领导者决定某个命令是第 135 个命令，它会尝试让该命令成为第 135 次 Paxos 实例中的被选中值。</p>
+<p>领导者通常能成功，但在某些情况下可能失败，例如其他服务器也认为自己是领导者并试图为相同位置发布不同的命令。然而，Paxos 算法保证在相同位置上最多只有一个命令能被选中。</p>
+<h2 id="34-paxos-的效率">3.4 Paxos 的效率</h2>
+<p>提议的值直到 第二阶段才被确定。在提议者完成第一阶段后，提议者可以选择根据已有的值进行提议，或者自由选择一个新值。领导者通常会在执行了某个阶段 1 后快速进入阶段 2，确保命令能被快速确定。</p>
+<h2 id="35-系统故障和领导者切换">3.5 系统故障和领导者切换</h2>
+<p>当领导者故障时，新领导者会被选举出来。新领导者需要从之前的 Paxos 实例中学习已经确定的命令，并从尚未选中的命令序列中开始提议新的值。例如，如果新领导者知道命令 1–134 和 138、139 已被选中，它会在 135–137 和 140 之后的实例中执行第一阶段，以确保这些位置的命令被填补。</p>
+<p>在处理命令缺口时，领导者可以选择用 “空操作（noop）” 来填补，这不会改变系统状态。这样可以确保系统的命令序列没有空隙，后续命令可以继续执行。</p>
+<h2 id="36-提议和响应">3.6 提议和响应</h2>
+<p>领导者可以在它的某个命令还未被确认选中时继续提议下一个命令。即使有些消息丢失，Paxos 算法也能通过消息重传来确保命令最终被选中。然而，如果领导者故障，可能会留下一些命令缺口，新领导者上任时需要填补这些缺口。</p>
+<h2 id="37-系统的扩展性和重配置">3.7 系统的扩展性和重配置</h2>
+<p>如果系统中的服务器集合需要改变，可以将服务器信息作为状态的一部分，通过状态机命令来更新。在执行第 i 个命令后，新的服务器集合可以被指定为处理第 i+α 个命令的服务器集合，这使得系统能够灵活地进行重新配置。</p>
+
+    </div>
+    <a href="/posts/paxos-%E5%88%86%E5%B8%83%E5%BC%8F%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/pre-push%E6%9C%AC%E5%9C%B0%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-集成测试">1. 集成测试</h1>
+<p>集成测试（Integration Testing）是一种软件测试方法，旨在验证不同模块或组件之间的交互是否按预期工作。集成测试关注多个模块或组件的组合和它们之间的接口。</p>
+<h1 id="2-本地集成测试">2. 本地集成测试</h1>
+<p>修改github项目并提交（git push）时，会触发pre-push钩子，在pre-push钩子中，会执行集成测试，并判断是否通过。
+本文编写了简单的集成测试，在项目提交时，集成测试会判断是否编译成功（c++），若不成功则提示编译失败，并阻止提交。
+未修改pre-push钩子时，默认将不会执行集成测试：<br>
+<img src="../blogImg/IntegrationTesting2.PNG" alt="Alt text"></p>
+<h1 id="3-pre-push集成测试的实现">3. pre-push集成测试的实现</h1>
+<h2 id="31-编写c文件用于测试集成测试是否成功">3.1 编写c++文件，用于测试集成测试是否成功</h2>
+<p>代码如下：</p>
+<blockquote>
+<p>#include <!-- raw HTML omitted --><br>
+int main() {<br>
+int n = 0;<br>
+std::cout &laquo; n &laquo; std::endl;<br>
+return 0;<br>
+}</p></blockquote>
+<h2 id="32-编写pre-push钩子脚本用于执行编译测试">3.2 编写pre-push钩子脚本，用于执行编译测试</h2>
+<p><img src="../blogImg/IntegrationTesting4.PNG" alt="Alt text"></p>
+<p>在项目根目录的.git/hooks中新建pre-push文件:</p>
+<pre tabindex="0"><code>remote=&#34;$1&#34;
+url=&#34;$2&#34;
+# Step 1: 编译 C++ 代码
+echo &#34;Compiling C++ code...&#34;
+g++ -o main main.cpp
+if [ $? -ne 0 ]; then
+    echo &#34;Compilation failed. Aborting push.&#34;
+    exit 1
+fi
+echo &#34;Compilation succeeded. Proceeding to check commits...&#34;
+# Step 2: 检查提交信息中是否包含 &#34;WIP&#34;
+# 计算空内容的哈希值（用于检查是否是删除操作）
+zero=$(git hash-object --stdin &lt;/dev/null | tr &#39;[0-9a-f]&#39; &#39;0&#39;)
+# 读取 git push 提供的本地和远程引用
+while read local_ref local_oid remote_ref remote_oid
+do
+        if test &#34;$local_oid&#34; = &#34;$zero&#34;
+        then
+                # Handle delete
+                :
+        else
+                if test &#34;$remote_oid&#34; = &#34;$zero&#34;
+                then
+                        # New branch, examine all commits
+                        range=&#34;$local_oid&#34;
+                else
+                        # Update to existing branch, examine new commits
+                        range=&#34;$remote_oid..$local_oid&#34;
+                fi
+                # Check for WIP commit
+                commit=$(git rev-list -n 1 --grep &#39;^WIP&#39; &#34;$range&#34;)
+                if test -n &#34;$commit&#34;
+                then
+                        echo &gt;&amp;2 &#34;Found WIP commit in $local_ref, not pushing&#34;
+                        exit 1
+                fi
+        fi
+done
+exit 0
+</code></pre><p>编写完成后执行命令<code>chmod +x pre-push</code>，使文件具有可执行权限。</p>
+<h2 id="33-测试">3.3 测试</h2>
+<p>测试时，在项目根目录下执行命令<code>git push origin main</code>，若编译成功，则提示推送成功，若编译失败，则提示编译失败，并阻止提交。<br>
+成功时：<br>
+<img src="../blogImg/IntegrationTesting3.PNG" alt=""><br>
+此时修改main.cpp文件，将<code>int n = 0;</code>注释掉，并再次执行<code>git push origin main</code>，此时会提示编译失败，并阻止提交： <br>
+<img src="../blogImg/IntegrationTesting1.PNG" alt=""></p>
+
+    </div>
+    <a href="/posts/pre-push%E6%9C%AC%E5%9C%B0%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-虚拟内存">1. 虚拟内存</h1>
+<p>硬件支持：<br>
+现代处理器通过内存管理单元（MMU）支持虚拟内存。虚拟内存将物理内存和存储设备（如硬盘）结合起来，使操作系统和程序可以使用比物理内存更多的空间。处理器中的MMU负责将进程访问的虚拟地址转换为物理地址。</p>
+<p>操作系统机制：<br>
+操作系统通过页表（Page Table）来维护虚拟地址和物理地址的映射关系。当进程请求的虚拟内存页不在物理内存中时，操作系统会产生“缺页中断”（Page Fault），然后从硬盘中加载相应的页面。</p>
+<h1 id="2-内存管理单元mmu">2. 内存管理单元（MMU）</h1>
+<p>MMU是计算机处理器中的一个硬件模块，它负责虚拟地址到物理地址的转换。在访问内存时，CPU首先生成虚拟地址，MMU将其转换为物理地址，从而访问实际的物理内存。</p>
+<p>TLB（Translation Lookaside Buffer）：<br>
+MMU中还有一种缓存叫TLB，用来存储虚拟地址到物理地址的映射，避免每次访问内存都进行复杂的页表查找。</p>
+<h1 id="3-内存共享">3. 内存共享</h1>
+<p>多个进程可以通过操作系统提供的共享内存机制共享物理内存的同一部分。共享内存是一种高效的进程间通信方式，避免了数据复制。</p>
+<p>操作系统支持：<br>
+共享内存通常由操作系统提供的系统调用（如<code>shmget</code>和<code>shmat</code>）实现。操作系统允许多个进程通过映射同一段物理内存来共享数据。</p>
+<h1 id="4-堆和栈的内存管理">4. 堆和栈的内存管理</h1>
+<p>栈（Stack）：<br>
+栈是一种连续的内存区域，常用于存储函数的局部变量和调用信息。栈的内存分配是自动的，当函数调用结束时，栈内存会自动释放。栈空间相对较小，速度快，但存储量有限。</p>
+<p>堆（Heap）：<br>
+堆用于动态分配内存，程序需要显式分配和释放堆内存（如C语言中的<code>malloc</code>和<code>free</code>）。堆的内存可以不连续，且大小比栈大得多。</p>
+<h1 id="5-缓存管理">5. 缓存管理</h1>
+<p>硬件缓存：<br>
+处理器内部通常有多级缓存（L1、L2、L3），这些缓存用于存储最近访问的内存数据，减少访问主内存的延迟。</p>
+<p>软件缓存：<br>
+数据库在应用层面也会实现缓存，例如缓冲池（Buffer Pool），用于缓存磁盘中的数据页，减少磁盘I/O操作。</p>
+<h1 id="6-垃圾回收garbage-collection">6. 垃圾回收（Garbage Collection）</h1>
+<p>手动内存管理：<br>
+在C/C++中，开发者需要手动管理内存的分配和释放，未能正确释放内存会导致内存泄漏。</p>
+<p>自动垃圾回收：<br>
+如Java等语言中有自动垃圾回收（GC）机制，GC通过追踪哪些内存块不再被引用来自动回收内存。</p>
+<h1 id="7-内存对齐">7. 内存对齐</h1>
+<p>CPU访问内存时，通常要求数据按特定字节对齐。例如，32位系统中，4字节的整数应按4字节对齐，64位系统中，8字节的数据应按8字节对齐。</p>
+<p>对齐内存访问可以提高访问速度，因为未对齐的访问可能需要多次内存访问。</p>
+<h1 id="8-内存映射io">8. 内存映射I/O</h1>
+<p>内存映射I/O（Memory-mapped I/O）允许将外部设备（如磁盘）直接映射到进程的地址空间中，从而可以通过内存读写操作访问设备。</p>
+<p>操作系统提供系统调用（如<code>mmap</code>），允许将文件或设备映射到内存中，这样文件中的数据就可以像内存一样访问。</p>
+<h1 id="9-内存碎片化">9. 内存碎片化</h1>
+<p>内存碎片：<br>
+随着内存的频繁分配和释放，可能会产生内存碎片。外部碎片是未被使用的小块内存，而内部碎片则是已分配但未完全使用的内存。</p>
+<p>内存管理技术：<br>
+通过内存池、紧凑分配等技术，可以减少内存碎片，提高内存使用效率。</p>
+<h1 id="10-数据库中特定的内存管理技术">10. 数据库中特定的内存管理技术</h1>
+<p>MVCC（多版本并发控制）：<br>
+MVCC通过存储数据的多个版本来支持并发事务。数据库需要管理不同版本的内存数据，确保旧版本能及时清理，避免内存浪费。</p>
+<p>日志管理：<br>
+数据库使用Redo Log和Undo Log来管理事务的回滚和恢复，这些日志需要有效的内存管理来确保高效性。</p>
+<p>内存表：<br>
+有些数据库（如In-Memory数据库）会将数据完全存储在内存中，因此内存管理策略在这类数据库中尤为重要。</p>
+
+    </div>
+    <a href="/posts/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+    </section>
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Page 3" class="page-link" role="button">3</a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Next" class="page-link" role="button"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/page/3/" aria-label="Last" class="page-link" role="button"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul></article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Wei Haoyu 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

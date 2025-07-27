@@ -183,8 +183,96 @@ B.Eng. in Communication Engineering | Sep 2019 – Jun 2023</p>
 
           </div>
         
+          <div class="w-100 mb4 relative">
+            
+<article class="bb b--black-10">
+  <div class="db pv4 ph3 ph0-l dark-gray no-underline">
+    <div class="flex-column flex-row-ns flex">
+      
+      <div class="blah w-100">
+        <h1 class="f3 fw1 athelas mt0 lh-title">
+          <a href="/posts/3ts/" class="color-inherit dim link">
+            
+            </a>
+        </h1>
+        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
+          <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="3ts">3TS</h1>
+<p><img src="../blogImg/1.png" alt="Alt text"></p>
+<h1 id="数据库中执行一致性测试">数据库中执行一致性测试</h1>
+<h1 id="1-postgresql安装">1. PostgreSQL安装</h1>
+<h2 id="11-下载-postgresql-15-的源码">1.1 下载 PostgreSQL 15 的源码</h2>
+<p><img src="../blogImg/2.png" alt="Alt text"></p>
+<pre tabindex="0"><code>wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz
+</code></pre><h2 id="12-解压源码包">1.2 解压源码包</h2>
+<p>解压下载的源码包：</p>
+<pre tabindex="0"><code>tar -xzvf postgresql-15.0.tar.gz
+</code></pre><h2 id="13-编译并安装-postgresql">1.3 编译并安装 PostgreSQL</h2>
+<p>进入源码目录，执行以下命令进行编译和安装：</p>
+<pre tabindex="0"><code>bash
+cd postgresql-15.0
+./configure
+make
+sudo make install
+</code></pre><h2 id="14-创建数据库用户和数据目录">1.4 创建数据库用户和数据目录</h2>
+<pre tabindex="0"><code>sudo mkdir /usr/local/pgsql
+sudo mkdir /usr/local/pgsql/data
+sudo chown nlove /usr/local/pgsql/data
+</code></pre><h2 id="15-初始化数据库">1.5 初始化数据库</h2>
+<p>初始化数据库:</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
+</code></pre><p><img src="../blogImg/3.png" alt="Alt text"></p>
+<h2 id="16-启动-postgresql-服务">1.6 启动 PostgreSQL 服务</h2>
+<p>启动 PostgreSQL 数据库服务：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start
+</code></pre><p><img src="../blogImg/4.png" alt="Alt text"><br>
+创建数据库 test：</p>
+        </div>
+        <a href="/posts/3ts/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+      </div>
+    </div>
+  </div>
+</article>
+
+          </div>
+        
       </section>
 
+      
+        <section class="w-100">
+          <h1 class="f3">More</h1>
+          
+          
+            <h2 class="f5 fw4 mb4 dib mr3">
+              <a href="/posts/bigtable-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F/" class="link black dim">
+                
+              </a>
+            </h2>
+          
+            <h2 class="f5 fw4 mb4 dib mr3">
+              <a href="/posts/bison%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/" class="link black dim">
+                
+              </a>
+            </h2>
+          
+            <h2 class="f5 fw4 mb4 dib mr3">
+              <a href="/posts/flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/" class="link black dim">
+                
+              </a>
+            </h2>
+          
+            <h2 class="f5 fw4 mb4 dib mr3">
+              <a href="/posts/google-file-system/" class="link black dim">
+                
+              </a>
+            </h2>
+          
+        </section>
       
 
     </div>
