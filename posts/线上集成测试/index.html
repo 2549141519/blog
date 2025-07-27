@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. GitHub Actions的工作流文件
+.github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。
+工作流的组成：
+
+
+name: 工作流的名称，用于标识这个工作流。
+on: 触发工作流的事件（如push、pull_request、schedule等）。
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。
+2. workflows集成测试实现
+要求集成测试能测试项目是否成功编译。
+在3TS中，有两种编译方式：
+
+
+
+直接编译安装，在3TS/src/dbtest目录下执行
+cmake -S ./
+make
+使用docker编译，执行以下命令安装docker（如果还未安装docker）
+curl -s https://get.docker.com/ | sh
+获取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+查看镜像ID，并根据镜像ID生成容器
+docker images
+docker run -it [image_id] /bin/bash
+查看所有容器，进入容器
+docker ps -a
+docker exec -it [container_id] /bin/bash
+
+2.1 集成测试实现
+在项目根目录下，进入.github/workflows文件夹，新建ci.yml文件，添加如下内容：
+name: 3TS CI
+
+on:
+  push:
+    branches:
+      - coo-consistency-check
+  pull_request:
+    branches:
+      - coo-consistency-check
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # 设置构建环境和安装依赖项
+    - name: Set up build environment
+      run: |
+        echo &#34;Setting up build environment...&#34;
+        sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g&#43;&#43; libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2
+        echo &#34;Build environment setup complete.&#34;
+
+    # 安装 Docker，如果尚未安装
+    - name: Install Docker
+      run: |
+        echo &#34;Installing Docker...&#34;
+        curl -s https://get.docker.com/ | sh
+        echo &#34;Docker installed successfully.&#34;
+
+    # 拉取 Docker 镜像
+    - name: Pull Docker image
+      run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+
+    # 列出 Docker 镜像
+    - name: List Docker images
+      run: docker images
+
+    # 运行 Docker 容器，并挂载项目目录
+    - name: Run Docker container with volume
+      run: |
+        IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0)
+        docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null
+
+    # 在 Docker 容器中编译
+    - name: Compile inside Docker
+      run: |
+        echo &#34;Compiling in Docker container...&#34;
+        docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34;
+
+    # 清理 Docker 容器
+    - name: Clean up Docker container
+      if: always()
+      run: docker rm -f 3ts_container
+
+    # 在非 Docker 环境编译
+    - name: Compile without Docker
+      run: |
+        echo &#34;Compiling using CMake...&#34;
+        cd src/dbtest
+        sudo rm -rf CMakeCache.txt CMakeFiles  # 清除缓存文件
+        cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./
+        make
+        echo &#34;Compilation finished.&#34;
+提交代码到coo-consistency-check分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。
+测试通过，说明项目可以成功编译。">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/%E7%BA%BF%E4%B8%8A%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/%E7%BA%BF%E4%B8%8A%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. GitHub Actions的工作流文件 .github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。
+工作流的组成：
+name: 工作流的名称，用于标识这个工作流。
+on: 触发工作流的事件（如push、pull_request、schedule等）。
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。
+2. workflows集成测试实现 要求集成测试能测试项目是否成功编译。
+在3TS中，有两种编译方式：
+直接编译安装，在3TS/src/dbtest目录下执行
+cmake -S ./
+make 使用docker编译，执行以下命令安装docker（如果还未安装docker）
+curl -s https://get.docker.com/ | sh
+获取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+查看镜像ID，并根据镜像ID生成容器
+docker images
+docker run -it [image_id] /bin/bash
+查看所有容器，进入容器
+docker ps -a
+docker exec -it [container_id] /bin/bash 2.1 集成测试实现 在项目根目录下，进入.github/workflows文件夹，新建ci.yml文件，添加如下内容：
+name: 3TS CI on: push: branches: - coo-consistency-check pull_request: branches: - coo-consistency-check jobs: build_and_test: runs-on: ubuntu-latest steps: - uses: actions/checkout@v2 # 设置构建环境和安装依赖项 - name: Set up build environment run: | echo &#34;Setting up build environment...&#34; sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g&#43;&#43; libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2 echo &#34;Build environment setup complete.&#34; # 安装 Docker，如果尚未安装 - name: Install Docker run: | echo &#34;Installing Docker...&#34; curl -s https://get.docker.com/ | sh echo &#34;Docker installed successfully.&#34; # 拉取 Docker 镜像 - name: Pull Docker image run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0 # 列出 Docker 镜像 - name: List Docker images run: docker images # 运行 Docker 容器，并挂载项目目录 - name: Run Docker container with volume run: | IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0) docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null # 在 Docker 容器中编译 - name: Compile inside Docker run: | echo &#34;Compiling in Docker container...&#34; docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34; # 清理 Docker 容器 - name: Clean up Docker container if: always() run: docker rm -f 3ts_container # 在非 Docker 环境编译 - name: Compile without Docker run: | echo &#34;Compiling using CMake...&#34; cd src/dbtest sudo rm -rf CMakeCache.txt CMakeFiles # 清除缓存文件 cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./ make echo &#34;Compilation finished.&#34; 提交代码到coo-consistency-check分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。
+测试通过，说明项目可以成功编译。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Nameless Monster">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. GitHub Actions的工作流文件 .github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。
+工作流的组成：
+name: 工作流的名称，用于标识这个工作流。
+on: 触发工作流的事件（如push、pull_request、schedule等）。
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。
+2. workflows集成测试实现 要求集成测试能测试项目是否成功编译。
+在3TS中，有两种编译方式：
+直接编译安装，在3TS/src/dbtest目录下执行
+cmake -S ./
+make 使用docker编译，执行以下命令安装docker（如果还未安装docker）
+curl -s https://get.docker.com/ | sh
+获取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+查看镜像ID，并根据镜像ID生成容器
+docker images
+docker run -it [image_id] /bin/bash
+查看所有容器，进入容器
+docker ps -a
+docker exec -it [container_id] /bin/bash 2.1 集成测试实现 在项目根目录下，进入.github/workflows文件夹，新建ci.yml文件，添加如下内容：
+name: 3TS CI on: push: branches: - coo-consistency-check pull_request: branches: - coo-consistency-check jobs: build_and_test: runs-on: ubuntu-latest steps: - uses: actions/checkout@v2 # 设置构建环境和安装依赖项 - name: Set up build environment run: | echo &#34;Setting up build environment...&#34; sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g&#43;&#43; libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2 echo &#34;Build environment setup complete.&#34; # 安装 Docker，如果尚未安装 - name: Install Docker run: | echo &#34;Installing Docker...&#34; curl -s https://get.docker.com/ | sh echo &#34;Docker installed successfully.&#34; # 拉取 Docker 镜像 - name: Pull Docker image run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0 # 列出 Docker 镜像 - name: List Docker images run: docker images # 运行 Docker 容器，并挂载项目目录 - name: Run Docker container with volume run: | IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0) docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null # 在 Docker 容器中编译 - name: Compile inside Docker run: | echo &#34;Compiling in Docker container...&#34; docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34; # 清理 Docker 容器 - name: Clean up Docker container if: always() run: docker rm -f 3ts_container # 在非 Docker 环境编译 - name: Compile without Docker run: | echo &#34;Compiling using CMake...&#34; cd src/dbtest sudo rm -rf CMakeCache.txt CMakeFiles # 清除缓存文件 cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./ make echo &#34;Compilation finished.&#34; 提交代码到coo-consistency-check分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。
+测试通过，说明项目可以成功编译。">
+  <meta itemprop="wordCount" content="282">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nameless Monster">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. GitHub Actions的工作流文件 .github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。
+工作流的组成：
+name: 工作流的名称，用于标识这个工作流。
+on: 触发工作流的事件（如push、pull_request、schedule等）。
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。
+2. workflows集成测试实现 要求集成测试能测试项目是否成功编译。
+在3TS中，有两种编译方式：
+直接编译安装，在3TS/src/dbtest目录下执行
+cmake -S ./
+make 使用docker编译，执行以下命令安装docker（如果还未安装docker）
+curl -s https://get.docker.com/ | sh
+获取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+查看镜像ID，并根据镜像ID生成容器
+docker images
+docker run -it [image_id] /bin/bash
+查看所有容器，进入容器
+docker ps -a
+docker exec -it [container_id] /bin/bash 2.1 集成测试实现 在项目根目录下，进入.github/workflows文件夹，新建ci.yml文件，添加如下内容：
+name: 3TS CI on: push: branches: - coo-consistency-check pull_request: branches: - coo-consistency-check jobs: build_and_test: runs-on: ubuntu-latest steps: - uses: actions/checkout@v2 # 设置构建环境和安装依赖项 - name: Set up build environment run: | echo &#34;Setting up build environment...&#34; sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g&#43;&#43; libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2 echo &#34;Build environment setup complete.&#34; # 安装 Docker，如果尚未安装 - name: Install Docker run: | echo &#34;Installing Docker...&#34; curl -s https://get.docker.com/ | sh echo &#34;Docker installed successfully.&#34; # 拉取 Docker 镜像 - name: Pull Docker image run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0 # 列出 Docker 镜像 - name: List Docker images run: docker images # 运行 Docker 容器，并挂载项目目录 - name: Run Docker container with volume run: | IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0) docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null # 在 Docker 容器中编译 - name: Compile inside Docker run: | echo &#34;Compiling in Docker container...&#34; docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34; # 清理 Docker 容器 - name: Clean up Docker container if: always() run: docker rm -f 3ts_container # 在非 Docker 环境编译 - name: Compile without Docker run: | echo &#34;Compiling using CMake...&#34; cd src/dbtest sudo rm -rf CMakeCache.txt CMakeFiles # 清除缓存文件 cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./ make echo &#34;Compilation finished.&#34; 提交代码到coo-consistency-check分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。
+测试通过，说明项目可以成功编译。">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-github-actions的工作流文件">1. GitHub Actions的工作流文件</h1>
+<p>.github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。<br>
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。<br>
+工作流的组成：</p>
+<blockquote>
+</blockquote>
+<p>name: 工作流的名称，用于标识这个工作流。<br>
+on: 触发工作流的事件（如push、pull_request、schedule等）。<br>
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。<br>
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。</p>
+<h1 id="2-workflows集成测试实现">2. workflows集成测试实现</h1>
+<p>要求集成测试能测试项目是否成功编译。<br>
+在3TS中，有两种编译方式：</p>
+<blockquote>
+</blockquote>
+<ol>
+<li>直接编译安装，在<code>3TS/src/dbtest</code>目录下执行<br>
+<code>cmake -S ./</code><br>
+<code>make</code></li>
+<li>使用docker编译，执行以下命令安装docker（如果还未安装docker）<br>
+<code>curl -s https://get.docker.com/ | sh</code><br>
+获取镜像<br>
+<code>docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0</code><br>
+查看镜像ID，并根据镜像ID生成容器<br>
+<code>docker images</code><br>
+<code>docker run -it [image_id] /bin/bash</code><br>
+查看所有容器，进入容器<br>
+<code>docker ps -a</code><br>
+<code>docker exec -it [container_id] /bin/bash</code></li>
+</ol>
+<h2 id="21-集成测试实现">2.1 集成测试实现</h2>
+<p>在项目根目录下，进入<code>.github/workflows</code>文件夹，新建<code>ci.yml</code>文件，添加如下内容：</p>
+<pre tabindex="0"><code>name: 3TS CI
+
+on:
+  push:
+    branches:
+      - coo-consistency-check
+  pull_request:
+    branches:
+      - coo-consistency-check
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # 设置构建环境和安装依赖项
+    - name: Set up build environment
+      run: |
+        echo &#34;Setting up build environment...&#34;
+        sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g++ libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2
+        echo &#34;Build environment setup complete.&#34;
+
+    # 安装 Docker，如果尚未安装
+    - name: Install Docker
+      run: |
+        echo &#34;Installing Docker...&#34;
+        curl -s https://get.docker.com/ | sh
+        echo &#34;Docker installed successfully.&#34;
+
+    # 拉取 Docker 镜像
+    - name: Pull Docker image
+      run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+
+    # 列出 Docker 镜像
+    - name: List Docker images
+      run: docker images
+
+    # 运行 Docker 容器，并挂载项目目录
+    - name: Run Docker container with volume
+      run: |
+        IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0)
+        docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null
+
+    # 在 Docker 容器中编译
+    - name: Compile inside Docker
+      run: |
+        echo &#34;Compiling in Docker container...&#34;
+        docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34;
+
+    # 清理 Docker 容器
+    - name: Clean up Docker container
+      if: always()
+      run: docker rm -f 3ts_container
+
+    # 在非 Docker 环境编译
+    - name: Compile without Docker
+      run: |
+        echo &#34;Compiling using CMake...&#34;
+        cd src/dbtest
+        sudo rm -rf CMakeCache.txt CMakeFiles  # 清除缓存文件
+        cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./
+        make
+        echo &#34;Compilation finished.&#34;
+</code></pre><p>提交代码到<code>coo-consistency-check</code>分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。<br>
+测试通过，说明项目可以成功编译。</p>
+<h1 id="3-集成测试结果">3. 集成测试结果</h1>
+<p>编译成功的测试结果如下：<br>
+<img src="../blogImg/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%951.PNG" alt="Alt text"></p>
+<p>此时若修改代码使编译不通过，测试结果如下：<br>
+<img src="../blogImg/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%952.PNG" alt="Alt text"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

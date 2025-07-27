@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. Flex的使用
+.l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。
+c编译器默认生成名为a.out的可执行文件。
+输入流经过a.out文件，输出词法单元序列。
+
+1.1 Flex源程序的一般形式
+三个部分：声明部分、转换规则、辅助函数。三个部分使用%分隔。 
+声明部分包含名称声明及选项设置，其中%{和%}之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。
+
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。
+
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。
+
+
+
+1.2 Flex处理二义性模式
+">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Flex的使用 .l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。
+c编译器默认生成名为a.out的可执行文件。
+输入流经过a.out文件，输出词法单元序列。
+1.1 Flex源程序的一般形式 三个部分：声明部分、转换规则、辅助函数。三个部分使用%分隔。 声明部分包含名称声明及选项设置，其中%{和%}之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。
+1.2 Flex处理二义性模式">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Nameless Monster">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Flex的使用 .l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。
+c编译器默认生成名为a.out的可执行文件。
+输入流经过a.out文件，输出词法单元序列。
+1.1 Flex源程序的一般形式 三个部分：声明部分、转换规则、辅助函数。三个部分使用%分隔。 声明部分包含名称声明及选项设置，其中%{和%}之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。
+1.2 Flex处理二义性模式">
+  <meta itemprop="wordCount" content="16">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nameless Monster">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Flex的使用 .l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。
+c编译器默认生成名为a.out的可执行文件。
+输入流经过a.out文件，输出词法单元序列。
+1.1 Flex源程序的一般形式 三个部分：声明部分、转换规则、辅助函数。三个部分使用%分隔。 声明部分包含名称声明及选项设置，其中%{和%}之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。
+1.2 Flex处理二义性模式">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-flex的使用">1. Flex的使用</h1>
+<p>.l是Flex源文件，经过Flex编译器，默认生成lex.yy.c文件。<br>
+c编译器默认生成名为a.out的可执行文件。<br>
+输入流经过a.out文件，输出词法单元序列。<br>
+<img src="../blogImg/Flex1.PNG" alt="图片1"></p>
+<h2 id="11-flex源程序的一般形式">1.1 Flex源程序的一般形式</h2>
+<p>三个部分：声明部分、转换规则、辅助函数。三个部分使用<code>%</code>分隔。 <br>
+声明部分包含名称声明及选项设置，其中<code>%{</code>和<code>%}</code>之间的内容会被原样复制到生成的c文件开头，通常放一些头文件及注释。<br>
+<img src="../blogImg/Flex2.PNG" alt="图片2"><br>
+转换规则部分，每个规则由两部分组成：模式和动作，两者由空白分开。词法分析程序识别出某个模式后，执行该模式对应的动作。<br>
+<img src="../blogImg/Flex3.PNG" alt="图片3"><br>
+辅助函数可以包含任一合法的c代码，这一部分的内容也会被复制到生成的c文件中。<br>
+<img src="../blogImg/Flex4.PNG" alt="图片4"><br>
+<img src="../blogImg/Flex5.PNG" alt="图片5"><br>
+<img src="../blogImg/Flex6.PNG" alt="图片6"></p>
+<h2 id="12-flex处理二义性模式">1.2 Flex处理二义性模式</h2>
+<p><img src="../blogImg/Flex7.PNG" alt="图片7"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

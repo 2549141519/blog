@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+    
+      <link href="/posts/index.xml" rel="alternate" type="application/rss+xml" title="Nameless Monster" />
+      <link href="/posts/index.xml" rel="feed" type="application/rss+xml" title="Nameless Monster" />
+      
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Posts">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Posts">
+  <meta itemprop="datePublished" content="2025-07-27T21:06:51+08:00">
+  <meta itemprop="dateModified" content="2025-07-27T21:06:51+08:00">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Posts">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+
+  <header>
+    <div class="pb3-m pb6-l bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+      <div class="tc-l pv3 ph3 ph4-ns">
+        <h1 class="f2 f-subheadline-l fw2 light-silver mb0 lh-title">
+          Posts
+        </h1>
+        
+      </div>
+    </div>
+  </header>
+
+
+    <main class="pb7" role="main">
+      
+  <article class="pa3 pa4-ns nested-copy-line-height">
+    <section class="cf ph3 ph5-l pv3 pv4-l f4 tc-l center measure-wide lh-copy nested-links mid-gray"></section>
+    <section class="flex-ns mt5 flex-wrap justify-around">
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/%E6%9C%8D%E5%8A%A1%E5%99%A8&#43;csv%E5%AE%89%E8%A3%85/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="ubuntu装服务器">Ubuntu装服务器</h1>
+<h3 id="下载">下载</h3>
+<p>去Ubuntu官网找到20.04的镜像文件，下载 iso文件(server版本 放入u盘)</p>
+<h3 id="安装">安装</h3>
+<ol>
+<li>使用新创建的可引导USB驱动器引导系统 按住F12键 选择英文
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv1.png" alt="![Alt text](image.png)"></li>
+<li>键盘布局选择默认
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv2.png" alt="![Alt text](image.png)"></li>
+<li>手动填入IP地址
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv3.png" alt="![Alt text](image.png)"></li>
+<li>代理不填 默认 接下来都选择默认 到用户名阶段 创建用户密码
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv4.png" alt="![Alt text](image.png)"></li>
+</ol>
+<h3 id="网络配置">网络配置</h3>
+<p>装好之后 配置网络</p>
+<pre tabindex="0"><code>$ sudo vi /etc/netplan/00-installer-config.yaml
+// 编辑如下，把其他网卡删掉了
+// 配置信息需要根据实际情况修改
+# This is the network config written by &#39;subiquity&#39;
+network:
+  ethernets:
+    eno3:
+      dhcp4: no
+      dhcp6: no
+      addresses: [your.ip/24]
+      gateway4: your.gateway
+      nameservers:
+        addresses: [your.dns1, your.dns2]
+</code></pre><p>配置生效 <code>sudo netplan apply</code></p>
+<h3 id="替换镜像源-能apt-install">替换镜像源 能apt-install</h3>
+<pre tabindex="0"><code>sudo cp /etc/apt/source.list /etc/apt/source.list.origin
+sudo vi /etc/apt/source.list
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+</code></pre><h3 id="安装梯子">安装梯子</h3>
+<p>这个我就不写了 有需要可由我来装</p>
+<h3 id="安装环境">安装环境</h3>
+<pre tabindex="0"><code>sudo apt-get update -y
+sudo apt-get install -y policycoreutils-python-utils
+sudo apt install policycoreutils selinux-utils selinux-basics
+sudo apt-get install -y semanage-utils
+</code></pre><p>装服务器应该默认装了ssh 现在就可以连接了
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv5.png" alt="![Alt text](image.png)"></p>
+<h1 id="csv安装">csv安装</h1>
+<h3 id="测试服务器">测试服务器</h3>
+<p>测试一下之前装的服务器成不成功</p>
+<pre tabindex="0"><code>$ sudo chmod a+w /opt
+$ cd /opt/
+$ git clone https://gitee.com/anolis/hygon-devkit.git
+$ mv hygon-devkit hygon
+$ sudo cp /opt/hygon/bin/hag /usr/bin
+</code></pre><h3 id="更换内核">更换内核</h3>
+<p>我们需要把虚拟机内核和服务器内核更换成适合csV架构的内核 先下载更换主机内核</p>
+<pre tabindex="0"><code>$ sudo chmod a+w /opt
+$ cd /opt/
+$ git clone https://gitee.com/anolis/hygon-devkit.git
+$ mv hygon-devkit hygon
+$ sudo cp /opt/hygon/bin/hag /usr/bin
+</code></pre><h3 id="导入证书">导入证书</h3>
+<pre tabindex="0"><code>sudo apt-get install -y ca-certificates
+# 如果已经根据 1-安装操作系统和内核部分安装了hygon-devkit，可以在以下目录找到hag
+$ ls -l /opt/hygon/bin/hag
+# 如果没有安装hygon-devkit，可以使用以下命令下载
+$ mkdir -p /opt/hygon/bin/
+$ cd /opt/hygon/bin/
+$ wget https://gitee.com/anolis/hygon-devkit/raw/master/bin/hag
+$ chmod +x hag
+
+$ cd /opt/hygon/bin
+$ sudo ./hag general get_id
+$ sudo ./hag general hgsc_version
+</code></pre><p>以下命令确认整数是否导入成功</p>
+<pre tabindex="0"><code>$ cd /opt/hygon/bin
+$ sudo ./hag csv platform_status
+</code></pre><p>可以看到是成功的
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv6.png" alt="![Alt text](image.png)"></p>
+<h3 id="安装软件">安装软件</h3>
+<ol>
+<li>安装依赖 <code>sudo /opt/hygon/csv/install_csv_sw.sh</code>
+后续还会缺依赖 不知道为啥 可能服务器新装的把 不过缺什么 apt-install即可</li>
+<li>安装qemu，用于启动虚拟机</li>
+</ol>
+<pre tabindex="0"><code>$ git clone https://gitee.com/anolis/hygon-qemu.git
+$ cd hygon-qemu/
+$ sudo /opt/hygon/csv/build_qemu.sh
+</code></pre><ol start="3">
+<li>安装grub</li>
+</ol>
+<pre tabindex="0"><code>$ wget https://ftp.gnu.org/gnu/grub/grub-2.06.tar.gz
+$ tar -xvf grub-2.06.tar.gz
+$ cd grub-2.06/
+$ sudo /opt/hygon/csv/build_grub.sh
+</code></pre><ol start="4">
+<li>安装edk2</li>
+</ol>
+<pre tabindex="0"><code>$ git clone https://gitee.com/anolis/hygon-edk2.git
+$ cd hygon-edk2/
+$ git submodule update --init
+$ sudo /opt/hygon/csv/build_edk2.sh
+</code></pre><ol start="5">
+<li>安装devit</li>
+</ol>
+<pre tabindex="0"><code>$ cd /opt/hygon/csv/
+$ sudo ./make_vm_img.sh
+$ git clone -b master https://github.com/guanzhi/GmSSL.git
+$ sudo ./build_devkit.sh
+</code></pre><ol start="6">
+<li>运行虚拟机</li>
+</ol>
+<pre tabindex="0"><code> sudo qemu-system-x86_64 -name csv-vm --enable-kvm -cpu host -m 6114 -hda /opt/hygon/csv/vm.qcow2 -drive if=pflash,format=raw,unit=0,file=/opt/hygon/csv/OVMF_CODE.fd,readonly=on -qmp tcp:127.0.0.1:2222,server,nowait -vnc 0.0.0.0:0 -object sev-guest,id=sev0,policy=0x1,cbitpos=47,reduced-phys-bits=5 -machine memory-encryption=sev0 -netdev bridge,br=virbr0,id=net0 -device virtio-net-pci,netdev=net0,romfile= -nographic
+</code></pre><p>这个命令需要改一下 我在虚拟机更新内核的时候磁盘空间不够了 这个虚拟机 他用的是用户模式 只能出不能进 所以需要用2222端口做ssh转发才能外部连接</p>
+<p>我成功配置好了
+<img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv7.png" alt="![Alt text](image.png)"></p>
+<ol start="7">
+<li>内核复制到虚拟机</li>
+</ol>
+<pre tabindex="0"><code>root@ubuntu:~# scp ubuntu@10.10.11.115:/opt/hygon/kernel.tgz ./
+ubuntu@10.10.11.115&#39;s password: 
+kernel.tgz                                      100%  112   147.7KB/s   00:
+</code></pre><ol start="8">
+<li>发现磁盘无法分区的话 先kill虚拟机进程 然后变大qemu的磁盘空间大小</li>
+</ol>
+<pre tabindex="0"><code>sudo qemu-img resize /opt/hygon/csv/vm.qcow2 +20G
+</code></pre><ol start="9">
+<li>成功安装</li>
+</ol>
+<p><img src="../blogImg/%E6%9C%8D%E5%8A%A1%E5%99%A8+csv8.png" alt="![Alt text](image.png)">
+对了 虚拟机镜像也要替换</p>
+
+    </div>
+    <a href="/posts/%E6%9C%8D%E5%8A%A1%E5%99%A8&#43;csv%E5%AE%89%E8%A3%85/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+        <div class="w-100 w-30-l mb4 relative bg-white">
+          <div class="w-100 mb4 nested-copy-line-height relative bg-white">
+  <div class="mb3 pa4 gray overflow-hidden bg-white">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/%E7%BA%BF%E4%B8%8A%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/" class="link black dim">
+        
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      <p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-github-actions的工作流文件">1. GitHub Actions的工作流文件</h1>
+<p>.github/workflows 文件夹中的每个文件都是一个工作流（workflow），通常以.yml或.yaml结尾。<br>
+每个工作流文件定义了一组自动化任务，这些任务会在特定事件发生时（如代码推送、PR创建、计划任务等）触发执行。<br>
+工作流的组成：</p>
+<blockquote>
+</blockquote>
+<p>name: 工作流的名称，用于标识这个工作流。<br>
+on: 触发工作流的事件（如push、pull_request、schedule等）。<br>
+jobs: 一组任务，每个任务可以在不同的虚拟机环境中运行。任务可以包含多个步骤（steps），每个步骤是一个具体的Shell命令或GitHub Action。<br>
+steps: 每个job下的具体步骤，用于执行脚本、运行命令、调用外部的GitHub Action等。</p>
+<h1 id="2-workflows集成测试实现">2. workflows集成测试实现</h1>
+<p>要求集成测试能测试项目是否成功编译。<br>
+在3TS中，有两种编译方式：</p>
+<blockquote>
+</blockquote>
+<ol>
+<li>直接编译安装，在<code>3TS/src/dbtest</code>目录下执行<br>
+<code>cmake -S ./</code><br>
+<code>make</code></li>
+<li>使用docker编译，执行以下命令安装docker（如果还未安装docker）<br>
+<code>curl -s https://get.docker.com/ | sh</code><br>
+获取镜像<br>
+<code>docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0</code><br>
+查看镜像ID，并根据镜像ID生成容器<br>
+<code>docker images</code><br>
+<code>docker run -it [image_id] /bin/bash</code><br>
+查看所有容器，进入容器<br>
+<code>docker ps -a</code><br>
+<code>docker exec -it [container_id] /bin/bash</code></li>
+</ol>
+<h2 id="21-集成测试实现">2.1 集成测试实现</h2>
+<p>在项目根目录下，进入<code>.github/workflows</code>文件夹，新建<code>ci.yml</code>文件，添加如下内容：</p>
+<pre tabindex="0"><code>name: 3TS CI
+
+on:
+  push:
+    branches:
+      - coo-consistency-check
+  pull_request:
+    branches:
+      - coo-consistency-check
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # 设置构建环境和安装依赖项
+    - name: Set up build environment
+      run: |
+        echo &#34;Setting up build environment...&#34;
+        sudo apt-get update &amp;&amp; sudo apt-get install -y cmake make g++ libgflags-dev unixodbc unixodbc-dev odbcinst odbcinst1debian2
+        echo &#34;Build environment setup complete.&#34;
+
+    # 安装 Docker，如果尚未安装
+    - name: Install Docker
+      run: |
+        echo &#34;Installing Docker...&#34;
+        curl -s https://get.docker.com/ | sh
+        echo &#34;Docker installed successfully.&#34;
+
+    # 拉取 Docker 镜像
+    - name: Pull Docker image
+      run: docker pull registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0
+
+    # 列出 Docker 镜像
+    - name: List Docker images
+      run: docker images
+
+    # 运行 Docker 容器，并挂载项目目录
+    - name: Run Docker container with volume
+      run: |
+        IMAGE_ID=$(docker images -q registry.cn-hangzhou.aliyuncs.com/open_projects/3ts_coo:1.0)
+        docker run -d --name 3ts_container -v ${{ github.workspace }}:/src $IMAGE_ID tail -f /dev/null
+
+    # 在 Docker 容器中编译
+    - name: Compile inside Docker
+      run: |
+        echo &#34;Compiling in Docker container...&#34;
+        docker exec -i 3ts_container bash -c &#34;cd /src/src/dbtest &amp;&amp; cmake -S ./ &amp;&amp; make&#34;
+
+    # 清理 Docker 容器
+    - name: Clean up Docker container
+      if: always()
+      run: docker rm -f 3ts_container
+
+    # 在非 Docker 环境编译
+    - name: Compile without Docker
+      run: |
+        echo &#34;Compiling using CMake...&#34;
+        cd src/dbtest
+        sudo rm -rf CMakeCache.txt CMakeFiles  # 清除缓存文件
+        cmake -S ./ || cmake -DCMAKE_PREFIX_PATH=/usr/ -S ./
+        make
+        echo &#34;Compilation finished.&#34;
+</code></pre><p>提交代码到<code>coo-consistency-check</code>分支，GitHub Actions就会自动触发工作流，并执行测试。申请pull request，审核通过也可以触发工作流。<br>
+测试通过，说明项目可以成功编译。</p>
+<h1 id="3-集成测试结果">3. 集成测试结果</h1>
+<p>编译成功的测试结果如下：<br>
+<img src="../blogImg/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%951.PNG" alt="Alt text"></p>
+<p>此时若修改代码使编译不通过，测试结果如下：<br>
+<img src="../blogImg/%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%952.PNG" alt="Alt text"></p>
+
+    </div>
+    <a href="/posts/%E7%BA%BF%E4%B8%8A%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
+    </section>
+    <ul class="pagination pagination-default">
+      <li class="page-item">
+        <a href="/posts/" aria-label="First" class="page-link" role="button"><span aria-hidden="true">&laquo;&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Previous" class="page-link" role="button"><span aria-hidden="true">&laquo;</span></a>
+      </li>
+      <li class="page-item">
+        <a href="/posts/" aria-label="Page 1" class="page-link" role="button">1</a>
+      </li>
+      <li class="page-item active">
+        <a aria-current="page" aria-label="Page 2" class="page-link" role="button">2</a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Next" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      <li class="page-item disabled">
+        <a aria-disabled="true" aria-label="Last" class="page-link" role="button" tabindex="-1"><span aria-hidden="true">&raquo;&raquo;</span></a>
+      </li>
+    </ul></article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+3TS
+
+数据库中执行一致性测试
+1. PostgreSQL安装
+1.1 下载 PostgreSQL 15 的源码
+
+wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz
+1.2 解压源码包
+解压下载的源码包：
+tar -xzvf postgresql-15.0.tar.gz
+1.3 编译并安装 PostgreSQL
+进入源码目录，执行以下命令进行编译和安装：
+bash
+cd postgresql-15.0
+./configure
+make
+sudo make install
+1.4 创建数据库用户和数据目录
+sudo mkdir /usr/local/pgsql
+sudo mkdir /usr/local/pgsql/data
+sudo chown nlove /usr/local/pgsql/data
+1.5 初始化数据库
+初始化数据库:
+/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
+
+1.6 启动 PostgreSQL 服务
+启动 PostgreSQL 数据库服务：
+/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start
+
+创建数据库 test：">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/3ts/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/3ts/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 3TS 数据库中执行一致性测试 1. PostgreSQL安装 1.1 下载 PostgreSQL 15 的源码 wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz 1.2 解压源码包 解压下载的源码包：
+tar -xzvf postgresql-15.0.tar.gz 1.3 编译并安装 PostgreSQL 进入源码目录，执行以下命令进行编译和安装：
+bash cd postgresql-15.0 ./configure make sudo make install 1.4 创建数据库用户和数据目录 sudo mkdir /usr/local/pgsql sudo mkdir /usr/local/pgsql/data sudo chown nlove /usr/local/pgsql/data 1.5 初始化数据库 初始化数据库:
+/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data 1.6 启动 PostgreSQL 服务 启动 PostgreSQL 数据库服务：
+/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start 创建数据库 test：">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Nameless Monster">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 3TS 数据库中执行一致性测试 1. PostgreSQL安装 1.1 下载 PostgreSQL 15 的源码 wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz 1.2 解压源码包 解压下载的源码包：
+tar -xzvf postgresql-15.0.tar.gz 1.3 编译并安装 PostgreSQL 进入源码目录，执行以下命令进行编译和安装：
+bash cd postgresql-15.0 ./configure make sudo make install 1.4 创建数据库用户和数据目录 sudo mkdir /usr/local/pgsql sudo mkdir /usr/local/pgsql/data sudo chown nlove /usr/local/pgsql/data 1.5 初始化数据库 初始化数据库:
+/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data 1.6 启动 PostgreSQL 服务 启动 PostgreSQL 数据库服务：
+/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start 创建数据库 test：">
+  <meta itemprop="wordCount" content="217">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nameless Monster">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 3TS 数据库中执行一致性测试 1. PostgreSQL安装 1.1 下载 PostgreSQL 15 的源码 wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz 1.2 解压源码包 解压下载的源码包：
+tar -xzvf postgresql-15.0.tar.gz 1.3 编译并安装 PostgreSQL 进入源码目录，执行以下命令进行编译和安装：
+bash cd postgresql-15.0 ./configure make sudo make install 1.4 创建数据库用户和数据目录 sudo mkdir /usr/local/pgsql sudo mkdir /usr/local/pgsql/data sudo chown nlove /usr/local/pgsql/data 1.5 初始化数据库 初始化数据库:
+/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data 1.6 启动 PostgreSQL 服务 启动 PostgreSQL 数据库服务：
+/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start 创建数据库 test：">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="3ts">3TS</h1>
+<p><img src="../blogImg/1.png" alt="Alt text"></p>
+<h1 id="数据库中执行一致性测试">数据库中执行一致性测试</h1>
+<h1 id="1-postgresql安装">1. PostgreSQL安装</h1>
+<h2 id="11-下载-postgresql-15-的源码">1.1 下载 PostgreSQL 15 的源码</h2>
+<p><img src="../blogImg/2.png" alt="Alt text"></p>
+<pre tabindex="0"><code>wget https://ftp.postgresql.org/pub/source/v15.0/postgresql-15.0.tar.gz
+</code></pre><h2 id="12-解压源码包">1.2 解压源码包</h2>
+<p>解压下载的源码包：</p>
+<pre tabindex="0"><code>tar -xzvf postgresql-15.0.tar.gz
+</code></pre><h2 id="13-编译并安装-postgresql">1.3 编译并安装 PostgreSQL</h2>
+<p>进入源码目录，执行以下命令进行编译和安装：</p>
+<pre tabindex="0"><code>bash
+cd postgresql-15.0
+./configure
+make
+sudo make install
+</code></pre><h2 id="14-创建数据库用户和数据目录">1.4 创建数据库用户和数据目录</h2>
+<pre tabindex="0"><code>sudo mkdir /usr/local/pgsql
+sudo mkdir /usr/local/pgsql/data
+sudo chown nlove /usr/local/pgsql/data
+</code></pre><h2 id="15-初始化数据库">1.5 初始化数据库</h2>
+<p>初始化数据库:</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
+</code></pre><p><img src="../blogImg/3.png" alt="Alt text"></p>
+<h2 id="16-启动-postgresql-服务">1.6 启动 PostgreSQL 服务</h2>
+<p>启动 PostgreSQL 数据库服务：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start
+</code></pre><p><img src="../blogImg/4.png" alt="Alt text"><br>
+创建数据库 test：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/createdb test
+</code></pre><p>创建一个名为 test 的数据库。<br>
+连接到数据库 test：</p>
+<pre tabindex="0"><code>/usr/local/pgsql/bin/psql test
+</code></pre><p><img src="../blogImg/5.png" alt="Alt text"></p>
+<pre tabindex="0"><code>CREATE USER why WITH PASSWORD &#39;123&#39;;
+ALTER USER why CREATEDB;
+</code></pre><p><img src="../blogImg/6.png" alt="Alt text"></p>
+<h2 id="17-why用户赋予-create-权限">1.7 why用户赋予 CREATE 权限</h2>
+<pre tabindex="0"><code>GRANT CREATE ON SCHEMA public TO why;
+</code></pre><p><img src="../blogImg/7.png" alt="Alt text"></p>
+<h1 id="2-安装-unixodbc">2. 安装 UnixODBC</h1>
+<pre tabindex="0"><code>sudo apt-get install unixodbc unixodbc-dev
+odbcinst -j
+</code></pre><p><img src="../blogImg/8.png" alt="Alt text"><br>
+显示 ODBC 驱动程序和数据源配置文件的位置。</p>
+<h1 id="3-配置-odbc-数据源">3. 配置 ODBC 数据源</h1>
+<p>编辑两个配置文件：<code>/etc/odbcinst.ini</code> 和 <code>/etc/odbc.ini</code>。</p>
+<h2 id="31-配置-etcodbcinstini">3.1 配置 <code>/etc/odbcinst.ini</code></h2>
+<pre tabindex="0"><code>sudo nano /etc/odbcinst.ini
+插入
+[PostgreSQL]
+Description = PostgreSQL ODBC Driver
+Driver = /usr/lib/x86_64-linux-gnu/odbc/psqlodbcw.so
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libodbcpsqlS.so
+FileUsage = 1
+</code></pre><p><img src="../blogImg/9.png" alt=" "></p>
+<h2 id="32-配置-etcodbcini">3.2 配置 <code>/etc/odbc.ini</code></h2>
+<p>这个文件用于配置数据源名称 (DSN)，即指定你将要连接的 PostgreSQL 数据库。</p>
+<pre tabindex="0"><code>sudo nano /etc/odbc.ini
+[pg]
+Description = PostgreSQL Database
+Driver = PostgreSQL
+Servername = localhost
+Port = 5432
+Database = test
+Username = why
+Password = 123
+</code></pre><p><img src="../blogImg/10.png" alt="Alt text"></p>
+<h2 id="33-配置环境变量">3.3 配置环境变量</h2>
+<p>确保 ODBCINI 和 ODBCSYSINI 环境变量被正确设置，这可以帮助 isql 工具找到配置文件。</p>
+<pre tabindex="0"><code>export ODBCSYSINI=/etc
+export ODBCINI=/etc/odbc.ini
+</code></pre><h2 id="34-测试">3.4 测试</h2>
+<p><img src="../blogImg/11.png" alt="Alt text"></p>
+<h1 id="4-测试一致性">4. 测试一致性</h1>
+<p>修改<code>auto_test.sh</code>,<code>user</code>,<code>password</code>。<br>
+<img src="../blogImg/12.png" alt="Alt text"></p>
+<pre tabindex="0"><code>./auto_test.sh &#34;pg&#34; &#34;read-uncommitted&#34;
+./auto_test.sh &#34;pg&#34; &#34;read-committed&#34;
+./auto_test.sh &#34;pg&#34; &#34;repeatable-read&#34;
+./auto_test.sh &#34;pg&#34; &#34;serializable&#34;
+</code></pre><p><img src="../blogImg/13.png" alt="Alt text"></p>
+<p><img src="../blogImg/14.png" alt="Alt text"></p>
+<h1 id="5-mysql同理">5. MYSQL同理</h1>
+<h2 id="51-安装好mysql后需要去官网安装mysql的obdc驱动">5.1 安装好mysql后,需要去官网安装mysql的obdc驱动</h2>
+<p><a href="https://dev.mysql.com/downloads/repo/apt/">MySQL :: Download MySQL APT Repository</a></p>
+<h2 id="52-配置obdc数据源">5.2 配置obdc数据源</h2>
+<p><img src="../blogImg/15.png" alt="Alt text"></p>
+<h2 id="53-配置数据源名称">5.3 配置数据源名称</h2>
+<p><img src="../blogImg/16.png" alt="Alt text"></p>
+<h2 id="54-运行3ts测试-测试结果如下">5.4 运行3ts测试 测试结果如下</h2>
+<p><img src="../blogImg/17.png" alt="Alt text"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. Bison简介
+Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。
+Bison分为Linux版本和Windows版本。
+2. Bison工作原理
+2.1 Bison和Flex协同工作
+Flex：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）
+编译顺序：
+
+协同工作顺序：
+
+3. Bison的输入
+Bison的输入为*.y文件：
+3.1定义段
+
+以c语法写的一些定义和声明，该部分以符号%{和%}包裹。
+对词法的终结符和非终结符的声明，主要包含：%token,%left,%right,%nonassoc,%union,%type,%start。
+%token定义语法中使用的终结符。
+
+%left,%right,%nonassoc也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。
+%left表示左结合，%right表示右结合，%nonassoc表示不可结合。
+%union为c语言的联合类型，声明语法分析器中符号值的类型。
+%union {
+    int num;
+    char *str;
+}
+一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号&lt;&gt;中的联合类型的相应成员名来确定。
+%token &lt;num&gt; TOKEN1
+%type定义语法中使用的非终结符。
+%start定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。
+3.2 语法规则段
+
+3.3 辅助函数段
+">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/bison%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/bison%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Bison简介 Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。
+Bison分为Linux版本和Windows版本。
+2. Bison工作原理 2.1 Bison和Flex协同工作 Flex：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）
+编译顺序：
+协同工作顺序：
+3. Bison的输入 Bison的输入为*.y文件：
+3.1定义段 以c语法写的一些定义和声明，该部分以符号%{和%}包裹。 对词法的终结符和非终结符的声明，主要包含：%token,%left,%right,%nonassoc,%union,%type,%start。
+%token定义语法中使用的终结符。 %left,%right,%nonassoc也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。
+%left表示左结合，%right表示右结合，%nonassoc表示不可结合。
+%union为c语言的联合类型，声明语法分析器中符号值的类型。
+%union { int num; char *str; } 一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号&lt;&gt;中的联合类型的相应成员名来确定。
+%token &lt;num&gt; TOKEN1
+%type定义语法中使用的非终结符。
+%start定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。
+3.2 语法规则段 3.3 辅助函数段">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Nameless Monster">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Bison简介 Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。
+Bison分为Linux版本和Windows版本。
+2. Bison工作原理 2.1 Bison和Flex协同工作 Flex：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）
+编译顺序：
+协同工作顺序：
+3. Bison的输入 Bison的输入为*.y文件：
+3.1定义段 以c语法写的一些定义和声明，该部分以符号%{和%}包裹。 对词法的终结符和非终结符的声明，主要包含：%token,%left,%right,%nonassoc,%union,%type,%start。
+%token定义语法中使用的终结符。 %left,%right,%nonassoc也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。
+%left表示左结合，%right表示右结合，%nonassoc表示不可结合。
+%union为c语言的联合类型，声明语法分析器中符号值的类型。
+%union { int num; char *str; } 一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号&lt;&gt;中的联合类型的相应成员名来确定。
+%token &lt;num&gt; TOKEN1
+%type定义语法中使用的非终结符。
+%start定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。
+3.2 语法规则段 3.3 辅助函数段">
+  <meta itemprop="wordCount" content="42">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nameless Monster">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. Bison简介 Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。
+Bison分为Linux版本和Windows版本。
+2. Bison工作原理 2.1 Bison和Flex协同工作 Flex：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）
+编译顺序：
+协同工作顺序：
+3. Bison的输入 Bison的输入为*.y文件：
+3.1定义段 以c语法写的一些定义和声明，该部分以符号%{和%}包裹。 对词法的终结符和非终结符的声明，主要包含：%token,%left,%right,%nonassoc,%union,%type,%start。
+%token定义语法中使用的终结符。 %left,%right,%nonassoc也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。
+%left表示左结合，%right表示右结合，%nonassoc表示不可结合。
+%union为c语言的联合类型，声明语法分析器中符号值的类型。
+%union { int num; char *str; } 一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号&lt;&gt;中的联合类型的相应成员名来确定。
+%token &lt;num&gt; TOKEN1
+%type定义语法中使用的非终结符。
+%start定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。
+3.2 语法规则段 3.3 辅助函数段">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-bison简介">1. Bison简介</h1>
+<p>Bison是yacc的现代版本，由自由软件基金会的GNU项目帮助发布。<br>
+Bison分为<a href="https://www.gnu.org/software/bison/">Linux版本</a>和<a href="https://gnuwin32.sourceforge.net/projects/bison.htm/">Windows版本</a>。</p>
+<h1 id="2-bison工作原理">2. Bison工作原理</h1>
+<h2 id="21-bison和flex协同工作">2.1 Bison和Flex协同工作</h2>
+<p><a href="Flex%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90.md">Flex</a>：词法分析器，将输入分割成一个个有意义的词块，称为记号（token）<br>
+Bison：语法分析器，根据给定的语法规则将Flex生成的tokens转换为抽象语法树（AST）<br>
+编译顺序：<br>
+<img src="../blogImg/Bison1.PNG" alt="图片1"><br>
+协同工作顺序：<br>
+<img src="../blogImg/Bison2.PNG" alt="图片2"></p>
+<h1 id="3-bison的输入">3. Bison的输入</h1>
+<p>Bison的输入为<code>*.y</code>文件：</p>
+<h2 id="31定义段">3.1定义段</h2>
+<ol>
+<li>以c语法写的一些定义和声明，该部分以符号<code>%{</code>和<code>%}</code>包裹。</li>
+<li>对词法的终结符和非终结符的声明，主要包含：<code>%token</code>,<code>%left</code>,<code>%right</code>,<code>%nonassoc</code>,<code>%union</code>,<code>%type</code>,<code>%start</code>。<br>
+<code>%token</code>定义语法中使用的终结符。</li>
+</ol>
+<p><code>%left</code>,<code>%right</code>,<code>%nonassoc</code>也是定义词法中的终结符，但它们定义的终结符具有某种优先级和结合性。<br>
+<code>%left</code>表示左结合，<code>%right</code>表示右结合，<code>%nonassoc</code>表示不可结合。</p>
+<p><code>%union</code>为c语言的联合类型，声明语法分析器中符号值的类型。</p>
+<pre tabindex="0"><code>%union {
+    int num;
+    char *str;
+}
+</code></pre><p>一旦联合类型被定义，就需要告诉Bison每种符号使用的值类型，通过在尖括号<code>&lt;&gt;</code>中的联合类型的相应成员名来确定。<br>
+<code>%token &lt;num&gt; TOKEN1</code></p>
+<p><code>%type</code>定义语法中使用的非终结符。</p>
+<p><code>%start</code>定义语法分析的开始符号，开始符号必须具备一个空规则，为了让开始输入的记号能从起始符号开始匹配。</p>
+<h2 id="32-语法规则段">3.2 语法规则段</h2>
+<p><img src="../blogImg/Bison3.PNG" alt="图片3"></p>
+<h2 id="33-辅助函数段">3.3 辅助函数段</h2>
+<p><img src="../blogImg/Bison4.PNG" alt="图片4"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>

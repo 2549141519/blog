@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Nameless Monster</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="点击返回🔗我的博客文章目录
+
+目录
+{:toc}
+
+
+1. 比较器
+本文介绍对于kdb中比较器Comparator的单元测试。
+比较器实现逻辑如下：
+解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。
+
+提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。
+
+比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。
+
+如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。
+
+结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。
+2. GoogleTest实现
+为测试比较器，实现了ComparatorTest。
+为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。
+std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) {
+  auto key_size = VarintLength(set_context-&gt;key.size());
+  auto value_size = VarintLength(set_context-&gt;value.size());
+  auto sequence_number = VarintLength(set_context-&gt;value.size());
+
+  std::string simple_set_str = fmt::format(
+      &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key,
+      format64_vec[sequence_number], kEmpty1Space,
+      format32_vec[value_size], set_context-&gt;value);
+
+  char* start_ptr = simple_set_str.data();
+  start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size());
+
+  start_ptr &#43;= set_context-&gt;key.size();
+  start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number);
+
+  EncodeFixed8(start_ptr,ValueType::kTypeValue);
+
+  start_ptr &#43;= 1;
+  EncodeVarint32(start_ptr, set_context-&gt;value.size());
+
+  return simple_set_str;
+}
+实现了三个测试用例：">
+    <meta name="generator" content="Hugo 0.145.0">
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+
+    
+
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/googletest-%E6%AF%94%E8%BE%83%E5%99%A8/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/googletest-%E6%AF%94%E8%BE%83%E5%99%A8/">
+  <meta property="og:site_name" content="Nameless Monster">
+  <meta property="og:title" content="Nameless Monster">
+  <meta property="og:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 比较器 本文介绍对于kdb中比较器Comparator的单元测试。
+比较器实现逻辑如下：
+解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。 提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。 比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。 如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。 结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。 2. GoogleTest实现 为测试比较器，实现了ComparatorTest。
+为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。
+std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) { auto key_size = VarintLength(set_context-&gt;key.size()); auto value_size = VarintLength(set_context-&gt;value.size()); auto sequence_number = VarintLength(set_context-&gt;value.size()); std::string simple_set_str = fmt::format( &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key, format64_vec[sequence_number], kEmpty1Space, format32_vec[value_size], set_context-&gt;value); char* start_ptr = simple_set_str.data(); start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size()); start_ptr &#43;= set_context-&gt;key.size(); start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number); EncodeFixed8(start_ptr,ValueType::kTypeValue); start_ptr &#43;= 1; EncodeVarint32(start_ptr, set_context-&gt;value.size()); return simple_set_str; } 实现了三个测试用例：">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+
+  <meta itemprop="name" content="Nameless Monster">
+  <meta itemprop="description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 比较器 本文介绍对于kdb中比较器Comparator的单元测试。
+比较器实现逻辑如下：
+解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。 提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。 比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。 如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。 结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。 2. GoogleTest实现 为测试比较器，实现了ComparatorTest。
+为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。
+std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) { auto key_size = VarintLength(set_context-&gt;key.size()); auto value_size = VarintLength(set_context-&gt;value.size()); auto sequence_number = VarintLength(set_context-&gt;value.size()); std::string simple_set_str = fmt::format( &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key, format64_vec[sequence_number], kEmpty1Space, format32_vec[value_size], set_context-&gt;value); char* start_ptr = simple_set_str.data(); start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size()); start_ptr &#43;= set_context-&gt;key.size(); start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number); EncodeFixed8(start_ptr,ValueType::kTypeValue); start_ptr &#43;= 1; EncodeVarint32(start_ptr, set_context-&gt;value.size()); return simple_set_str; } 实现了三个测试用例：">
+  <meta itemprop="wordCount" content="222">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nameless Monster">
+  <meta name="twitter:description" content="点击返回🔗我的博客文章目录
+目录 {:toc} 1. 比较器 本文介绍对于kdb中比较器Comparator的单元测试。
+比较器实现逻辑如下：
+解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。 提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。 比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。 如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。 结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。 2. GoogleTest实现 为测试比较器，实现了ComparatorTest。
+为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。
+std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) { auto key_size = VarintLength(set_context-&gt;key.size()); auto value_size = VarintLength(set_context-&gt;value.size()); auto sequence_number = VarintLength(set_context-&gt;value.size()); std::string simple_set_str = fmt::format( &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key, format64_vec[sequence_number], kEmpty1Space, format32_vec[value_size], set_context-&gt;value); char* start_ptr = simple_set_str.data(); start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size()); start_ptr &#43;= set_context-&gt;key.size(); start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number); EncodeFixed8(start_ptr,ValueType::kTypeValue); start_ptr &#43;= 1; EncodeVarint32(start_ptr, set_context-&gt;value.size()); return simple_set_str; } 实现了三个测试用例：">
+
+	
+  </head><body class="ma0 avenir bg-near-white development">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l center items-center justify-between">
+    <a href="/" class="f3 fw2 hover-white white-90 dib no-underline">
+      
+        Nameless Monster
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      <div class="ananke-socials"></div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  
+  <article class="flex-l mw8 center ph3 flex-wrap justify-between">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside><div id="sharing" class="mt3 ananke-socials"></div>
+<h1 class="f1 athelas mt3 mb1"></h1>
+      
+      
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><p>点击返回<a href="https://2549141519.github.io/#/toc">🔗我的博客文章目录</a></p>
+<ul>
+<li>目录
+{:toc}</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="1-比较器">1. 比较器</h1>
+<p>本文介绍对于kdb中比较器<a href="https://github.com/2549141519/kdb/src/db/comp.cpp"><code>Comparator</code></a>的单元测试。</p>
+<p>比较器实现逻辑如下：</p>
+<pre tabindex="0"><code>解析键的长度： 代码首先从 left 和 right 字符串视图中读取键的长度（前面编码成 Varint 的 32 位整数）。通过 GetVarint32Ptr 函数从数据中解析出键的长度，并进行断言检查确保解析成功。
+
+提取键值： 通过从 left_key_len_ptr 和 right_key_len_ptr 解析出的长度，创建两个新的 std::string_view 分别表示 left 和 right 的键值。
+
+比较键值： 如果两个键值不同，直接比较它们的字符串值。std::string_view 支持字典序比较，代码通过 operator&lt; 和 operator&gt; 来进行比较，结果为 -1（left 小于 right）、1（left 大于 right）。
+
+如果键值相等： 当两个键值相等时，代码进一步解析并比较序列号。使用 GetVarint64Ptr 函数从键值之后的位置提取出 64 位序列号，并进行比较。最终返回比较结果。
+
+结果返回： 返回 -1 表示 left 小于 right，1 表示 left 大于 right，0 表示它们完全相同。
+</code></pre><h1 id="2-googletest实现">2. GoogleTest实现</h1>
+<p>为测试比较器，实现了<a href="https://github.com/2549141519/kdb/src/db/test/comptest.cpp"><code>ComparatorTest</code></a>。</p>
+<p>为了模拟工作场景，在测试中实现了Set函数，用于将数据编码为sstable内部键的格式。</p>
+<pre tabindex="0"><code>std::string Set(const std::shared_ptr&lt;SetContext&gt;&amp; set_context) {
+  auto key_size = VarintLength(set_context-&gt;key.size());
+  auto value_size = VarintLength(set_context-&gt;value.size());
+  auto sequence_number = VarintLength(set_context-&gt;value.size());
+
+  std::string simple_set_str = fmt::format(
+      &#34;{}{}{}{}{}{}&#34;, format32_vec[key_size], set_context-&gt;key,
+      format64_vec[sequence_number], kEmpty1Space,
+      format32_vec[value_size], set_context-&gt;value);
+
+  char* start_ptr = simple_set_str.data();
+  start_ptr = EncodeVarint32(start_ptr, set_context-&gt;key.size());
+
+  start_ptr += set_context-&gt;key.size();
+  start_ptr = EncodeVarint64(start_ptr, set_context-&gt;number);
+
+  EncodeFixed8(start_ptr,ValueType::kTypeValue);
+
+  start_ptr += 1;
+  EncodeVarint32(start_ptr, set_context-&gt;value.size());
+
+  return simple_set_str;
+}
+</code></pre><p>实现了三个测试用例：</p>
+<ol>
+<li>测试两个相同的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareEqualStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;key&#34;));
+    context1.number = 1;
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key&#34;));
+    context2.number = 2;
+
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2));  // session1 &lt; session2，
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); // session2 &gt; session1，
+}
+</code></pre><p>在键值相同时，比较序列号大小。</p>
+<ol start="2">
+<li>测试两个不同的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareDifferentStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;key1&#34;));
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key2&#34;));
+    
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2)); 
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); 
+}
+</code></pre><ol start="3">
+<li>测试空的键值：</li>
+</ol>
+<pre tabindex="0"><code>TEST_F(ComparatorTest, CompareEmptyStringView) {
+    SetContext context1(std::string_view(&#34;key1&#34;), std::string_view(&#34;&#34;));
+    SetContext context2(std::string_view(&#34;key2&#34;), std::string_view(&#34;key&#34;));
+
+    std::string_view testcontext1 = Set(std::make_shared&lt;SetContext&gt;(context1));
+    std::string_view testcontext2 = Set(std::make_shared&lt;SetContext&gt;(context2));
+
+    EXPECT_EQ(-1,cmp(testcontext1, testcontext2)); 
+    EXPECT_EQ(1,cmp(testcontext2, testcontext1)); 
+}
+</code></pre><p>测试命令：<br>
+<code>g++ -std=c++17 -I /usr/local/include -I /path/to/fmt/include -L /usr/local/lib comptest.cpp ../comp.cpp ../../utils/coding.cpp -o comptest -lgtest -lgtest_main -pthread -lfmt</code><br>
+执行命令后生成comptest文件，执行./comptest即可。</p>
+<p>测试结果如下：<br>
+<img src="../blogImg/gtest1.PNG" alt="Alt text"></p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
+    &copy;  Nameless Monster 2025 
+  </a>
+    <div><div class="ananke-socials"></div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>
